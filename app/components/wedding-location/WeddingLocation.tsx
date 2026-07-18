@@ -152,7 +152,7 @@ export default function WeddingLocation({
 
   return (
     <section
-      className={`${GowunDodum.className} flex w-full flex-col items-center bg-white px-5 pt-14 text-[#333333]`}
+      className={`${GowunDodum.className} flex w-full flex-col items-center bg-white px-5 pt-14 pb-14 text-[#333333]`}
       aria-labelledby="wedding-location-title"
     >
       <Script

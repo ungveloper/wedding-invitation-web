@@ -417,7 +417,7 @@ export default function WeddingGallery({
   return (
     <>
       <section
-        className={`m-0 box-border flex w-full flex-col items-center px-5 pt-14 pb-12 text-[#333333] ${GowunDodum.className} overflow-hidden`}
+        className={`m-0 box-border flex w-full flex-col items-center px-5 pt-14 pb-14 text-[#333333] bg-[#f4f3f1] ${GowunDodum.className} overflow-hidden`}
         aria-labelledby="wedding-gallery-title"
       >
         <WeddingSectionHeader
