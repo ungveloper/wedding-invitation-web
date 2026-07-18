@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
-import styles from './Handwriting.module.css';
 import { variants, type HandwritingVariant } from './variants';
 
 export type { HandwritingVariant } from './variants';
@@ -20,12 +19,6 @@ export type HandwritingProps = {
   color?: string;
 };
 
-type AnimationStyle = CSSProperties & {
-  '--draw-duration': string;
-  '--draw-delay': string;
-  color: string;
-};
-
 type HandwritingRendererProps = Omit<HandwritingProps, 'variant' | 'type'> & {
   variant: HandwritingVariant;
 };
@@ -39,10 +32,11 @@ function HandwritingRenderer({
   threshold = 0.25,
   ariaLabel,
   color = '#d97e9f',
-}: HandwritingRendererProps) {
+}: HandwritingRendererProps): React.ReactElement {
   const artwork = variants[variant];
   const rootRef = useRef<HTMLDivElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
+  const animationRef = useRef<Animation | null>(null);
   const reactId = useId();
   const clipPathId = `handwriting-clip-${reactId.replace(
     /[^a-zA-Z0-9_-]/g,
@@ -50,21 +44,16 @@ function HandwritingRenderer({
   )}`;
 
   const [isVisible, setIsVisible] = useState(false);
-  const [isReady, setIsReady] = useState(false);
+  const [pathLength, setPathLength] = useState(0);
 
   useEffect(() => {
     const path = pathRef.current;
 
-    if (!path) return;
+    if (!path) {
+      return;
+    }
 
-    const length = path.getTotalLength();
-
-    // 빈 구간을 실제 경로보다 크게 만들어 마지막 획이
-    // 애니메이션 전에 점처럼 되감겨 보이지 않게 합니다.
-    path.style.setProperty('--path-length', `${length}`);
-    path.style.setProperty('--path-gap', `${length * 2}`);
-
-    setIsReady(true);
+    setPathLength(path.getTotalLength());
   }, []);
 
   useEffect(() => {
@@ -92,31 +81,93 @@ function HandwritingRenderer({
 
     observer.observe(element);
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, [once, threshold]);
 
-  const animationStyle: AnimationStyle = {
-    '--draw-duration': `${duration ?? artwork.defaultDuration}s`,
-    '--draw-delay': `${delay}s`,
+  useEffect(() => {
+    const path = pathRef.current;
+
+    if (!path || pathLength <= 0) {
+      return;
+    }
+
+    animationRef.current?.cancel();
+    animationRef.current = null;
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    if (prefersReducedMotion) {
+      path.style.opacity = '1';
+      path.style.strokeDashoffset = '0';
+      return;
+    }
+
+    if (!isVisible) {
+      path.style.opacity = '0';
+      path.style.strokeDashoffset = `${pathLength}`;
+      return;
+    }
+
+    const animation = path.animate(
+      [
+        {
+          opacity: 0,
+          strokeDashoffset: `${pathLength}`,
+          offset: 0,
+        },
+        {
+          opacity: 1,
+          strokeDashoffset: `${pathLength}`,
+          offset: 0.0001,
+        },
+        {
+          opacity: 1,
+          strokeDashoffset: '0',
+          offset: 1,
+        },
+      ],
+      {
+        duration: (duration ?? artwork.defaultDuration) * 1000,
+        delay: delay * 1000,
+        easing: 'cubic-bezier(0.45, 0, 0.3, 1)',
+        fill: 'both',
+      },
+    );
+
+    animationRef.current = animation;
+
+    return () => {
+      animation.cancel();
+
+      if (animationRef.current === animation) {
+        animationRef.current = null;
+      }
+    };
+  }, [artwork.defaultDuration, delay, duration, isVisible, pathLength]);
+
+  const rootStyle: CSSProperties = {
     color,
+  };
+
+  const drawingPathStyle: CSSProperties = {
+    strokeDasharray: `${pathLength} ${pathLength * 2}`,
+    strokeDashoffset: pathLength,
+    opacity: 0,
   };
 
   return (
     <div
       ref={rootRef}
-      className={[
-        styles.root,
-        isReady ? styles.ready : '',
-        isVisible ? styles.visible : '',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      style={animationStyle}
+      className={['w-full', className].filter(Boolean).join(' ')}
+      style={rootStyle}
       data-handwriting-variant={variant}
     >
       <svg
-        className={styles.svg}
+        className="block h-auto w-full overflow-visible"
         xmlns="http://www.w3.org/2000/svg"
         viewBox={artwork.viewBox}
         role="img"
@@ -136,7 +187,8 @@ function HandwritingRenderer({
 
         <path
           ref={pathRef}
-          className={styles.drawingPath}
+          className="fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round] will-change-[stroke-dashoffset,opacity]"
+          style={drawingPathStyle}
           clipPath={`url(#${clipPathId})`}
           d={artwork.drawingPath}
           strokeWidth={artwork.strokeWidth}
@@ -150,7 +202,7 @@ export default function Handwriting({
   variant,
   type,
   ...props
-}: HandwritingProps) {
+}: HandwritingProps): React.ReactElement {
   const resolvedVariant = variant ?? type ?? 'gettingMarried';
 
   // variant 변경 시 내부 상태와 SVG 경로 길이를 새로 초기화합니다.

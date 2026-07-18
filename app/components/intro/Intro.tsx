@@ -1,13 +1,12 @@
 'use client';
 
-import type { ComponentType, ReactNode } from 'react';
+import type { ComponentType } from 'react';
 import Curtain from './curtain/Curtain';
 import { variants, type IntroVariant } from './variants';
 
 export type { IntroVariant } from './variants';
 
 export type IntroProps = {
-  children: ReactNode;
   className?: string;
 
   /** 권장 prop. 표시할 인트로 효과입니다. */

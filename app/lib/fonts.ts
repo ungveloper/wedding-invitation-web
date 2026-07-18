@@ -18,43 +18,20 @@ export const NanumMyeongjo = localFont({
   ],
 });
 
-export const SCoreDream = localFont({
+export const Solinsunny = localFont({
   src: [
     {
-      path: '../../public/fonts/SCoreDream/900.woff2',
-      weight: '900',
-    },
-    {
-      path: '../../public/fonts/SCoreDream/800.woff2',
-      weight: '800',
-    },
-    {
-      path: '../../public/fonts/SCoreDream/700.woff2',
-      weight: '700',
-    },
-    {
-      path: '../../public/fonts/SCoreDream/600.woff2',
-      weight: '600',
-    },
-    {
-      path: '../../public/fonts/SCoreDream/500.woff2',
-      weight: '500',
-    },
-    {
-      path: '../../public/fonts/SCoreDream/400.woff2',
+      path: '../../public/fonts/Solinsunny/400.woff2',
       weight: '400',
     },
+  ],
+});
+
+export const GowunDodum = localFont({
+  src: [
     {
-      path: '../../public/fonts/SCoreDream/300.woff2',
-      weight: '300',
-    },
-    {
-      path: '../../public/fonts/SCoreDream/200.woff2',
-      weight: '200',
-    },
-    {
-      path: '../../public/fonts/SCoreDream/100.woff2',
-      weight: '100',
+      path: '../../public/fonts/GowunDodum/400.woff2',
+      weight: '400',
     },
   ],
 });
