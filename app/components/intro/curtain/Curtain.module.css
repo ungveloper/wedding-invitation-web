@@ -92,8 +92,8 @@
   text-align: center;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
   transition:
-    opacity 0.38s ease,
-    transform 0.38s ease;
+    opacity 0.38s ease var(--curtain-delay),
+    transform 0.38s ease var(--curtain-delay);
   pointer-events: none;
 }
 

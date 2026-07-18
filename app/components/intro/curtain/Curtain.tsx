@@ -48,6 +48,7 @@ export default function Curtain({
   className = '',
   duration = 1.45,
   delay = 0,
+  autoOpen = false,
   eyebrow = 'Wedding',
   title = 'Invitation',
   openLabel = '터치하여 열기',
@@ -62,7 +63,9 @@ export default function Curtain({
 }: IntroRendererProps) {
   const [state, setState] = useState<CurtainState>('closed');
   const [isMounted, setIsMounted] = useState(true);
+
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoOpenStartedRef = useRef(false);
 
   const safeDuration = Number.isFinite(duration) ? Math.max(duration, 0) : 1.45;
   const safeDelay = Number.isFinite(delay) ? Math.max(delay, 0) : 0;
@@ -113,6 +116,22 @@ export default function Curtain({
       onOpen?.();
     }, totalMilliseconds);
   }, [onOpen, safeDelay, safeDuration, state]);
+
+  /**
+   * autoOpen이 true이면 컴포넌트가 마운트된 후
+   * 자동으로 커튼 열기를 시작합니다.
+   *
+   * 실제 커튼 이동은 CSS의 --curtain-delay만큼
+   * 기다린 다음 실행됩니다.
+   */
+  useEffect(() => {
+    if (!autoOpen || autoOpenStartedRef.current) {
+      return;
+    }
+
+    autoOpenStartedRef.current = true;
+    handleOpen();
+  }, [autoOpen, handleOpen]);
 
   const curtainStyle: CurtainStyle = {
     '--curtain-duration': `${safeDuration}s`,

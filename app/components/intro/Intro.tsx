@@ -16,11 +16,19 @@ export type IntroProps = {
   /** variant의 별칭입니다. 둘 다 전달하면 variant가 우선합니다. */
   type?: IntroVariant;
 
-  /** 터치 후 인트로가 열리는 데 걸리는 시간입니다. 단위는 초입니다. */
+  /** 인트로가 열리는 데 걸리는 시간입니다. 단위는 초입니다. */
   duration?: number;
 
-  /** 터치 후 애니메이션 시작 전 대기 시간입니다. 단위는 초입니다. */
+  /**
+   * 열기 요청 후 애니메이션 시작 전 대기 시간입니다.
+   * autoOpen이 true이면 페이지 진입 후 자동 열기까지의 시간으로 사용됩니다.
+   */
   delay?: number;
+
+  /**
+   * true이면 버튼을 누르지 않아도 자동으로 커튼을 엽니다.
+   */
+  autoOpen?: boolean;
 
   eyebrow?: string;
   title?: string;

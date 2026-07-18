@@ -7,12 +7,16 @@ export default function Home() {
       <Intro
         variant="curtain"
         duration={1.45}
+        delay={0.2}
+        autoOpen
         eyebrow="Wedding"
         title="Invitation"
         openLabel="터치하여 열기"
       >
         <Cover />
       </Intro>
+
+      <div className="h-[300vh]"></div>
     </main>
   );
 }
