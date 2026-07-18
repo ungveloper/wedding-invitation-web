@@ -3,12 +3,12 @@ import localFont from 'next/font/local';
 export const ChosunNm = localFont({
   src: [
     {
-      path: '../../../public/fonts/freesentation/400.woff2',
+      path: '../../public/fonts/ChosunNm/400.woff2',
       weight: '400',
     },
   ],
 });
-
+/* 
 export const freesentation = localFont({
   src: [
     {
@@ -49,3 +49,4 @@ export const freesentation = localFont({
     },
   ],
 });
+ */
