@@ -10,7 +10,7 @@ import WeddingLocation from './components/wedding-location/WeddingLocation';
 
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-md flex-col">
+    <main className="mx-auto max-w-md w-full flex flex-col min-[449px]:border-x min-[449px]:border-[#e5e5e5]">
       <Intro
         variant="curtain"
         duration={1.45}
