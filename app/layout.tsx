@@ -1,4 +1,5 @@
 import type { Viewport } from 'next';
+import { Toaster } from 'sonner';
 import './globals.css';
 
 export const viewport: Viewport = {
@@ -14,8 +15,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="ko" className="h-full antialiased">
+      <body className="flex min-h-full flex-col">
+        {children}
+        <Toaster position="top-center" />
+      </body>
     </html>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import Image from 'next/image';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import WeddingRibbon from '../common/WeddingRibbon';
 import { GowunDodum } from '../../lib/fonts';
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -20,14 +20,10 @@ const KOREAN_WEEKDAYS = [
 
 const SECTION_BASE_CLASS = [
   'box-border w-full bg-[#f4f3f1] px-4 pt-[46px] pb-[50px] text-[#333333]',
-  'translate-y-6 opacity-0 transition-[opacity,transform] duration-[800ms]',
-  'max-[360px]:px-[14px]',
-  'motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none',
 ].join(' ');
 
 const COUNTER_CLASS = [
   'mt-5 grid grid-cols-[64px_1fr_64px_1fr_64px_1fr_64px] items-center',
-  'max-[360px]:grid-cols-[61px_1fr_61px_1fr_61px_1fr_61px]',
 ].join(' ');
 
 type WeddingCalendarProps = {
@@ -137,8 +133,6 @@ export default function WeddingCalendar({
   groomName = '지웅재',
   brideName = '송혜정',
 }: WeddingCalendarProps): React.ReactElement {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
   const [countdown, setCountdown] = useState<Countdown>(INITIAL_COUNTDOWN);
 
   const targetTimestamp = useMemo(
@@ -171,28 +165,6 @@ export default function WeddingCalendar({
     return () => window.clearInterval(timer);
   }, [targetTimestamp]);
 
-  useEffect(() => {
-    const section = sectionRef.current;
-
-    if (!section) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.18 },
-    );
-
-    observer.observe(section);
-
-    return () => observer.disconnect();
-  }, []);
-
   const period = hour < 12 ? '오전' : '오후';
   const displayHour = hour % 12 || 12;
   const displayTime =
@@ -200,19 +172,10 @@ export default function WeddingCalendar({
 
   return (
     <section
-      ref={sectionRef}
-      className={`${SECTION_BASE_CLASS} ${GowunDodum.className} ${
-        isVisible ? 'translate-y-0 opacity-100' : ''
-      }`}
+      className={`${SECTION_BASE_CLASS} ${GowunDodum.className}`}
       aria-label={`${year}년 ${month + 1}월 ${day}일 예식 달력`}
     >
-      <Image
-        className="mx-auto mb-5.25 block h-auto w-30.5 object-contain"
-        src="/images/message/decoration_ribbon.png"
-        alt=""
-        width={134}
-        height={40}
-      />
+      <WeddingRibbon />
 
       <header className="text-center">
         <div className="text-[30px] leading-[1.2] font-black tracking-[-0.045em] tabular-nums">
@@ -274,7 +237,7 @@ export default function WeddingCalendar({
         <CounterItem label="SEC" value={countdown.seconds} />
       </div>
 
-      <div className="mt-7.75 text-center text-lg leading-normal font-medium tracking-[-0.045em] whitespace-nowrap max-[360px]:text-sm">
+      <div className="mt-7.75 text-center text-lg leading-normal font-medium tracking-[-0.045em] whitespace-nowrap">
         {countdown.isPast && !countdown.isWeddingDay ? (
           <span>함께해 주셔서 감사합니다.</span>
         ) : countdown.isWeddingDay ? (

@@ -1,11 +1,14 @@
 'use client';
 
 import Image from 'next/image';
-import Script from 'next/script';
-import { useEffect, useRef, useState } from 'react';
-import { GowunDodum } from '../../lib/fonts';
 import Link from 'next/link';
+import Script from 'next/script';
 import { ChevronsRight, Copy } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { toast } from 'sonner';
+import WeddingSectionHeader from '../common/WeddingSectionHeader';
+import { GowunDodum } from '../../lib/fonts';
 
 const DEFAULT_NAVER_MAP_CLIENT_ID = 't001dpgy5u';
 
@@ -67,34 +70,8 @@ export default function WeddingLocation({
   naverMapClientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID ??
     DEFAULT_NAVER_MAP_CLIENT_ID,
 }: WeddingLocationProps): React.ReactElement {
-  const sectionRef = useRef<HTMLElement>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const copiedTimerRef = useRef<number | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
   const [mapStatus, setMapStatus] = useState<MapStatus>('loading');
-
-  useEffect(() => {
-    const section = sectionRef.current;
-
-    if (!section) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.15 },
-    );
-
-    observer.observe(section);
-
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const previousAuthFailure = window.navermap_authFailure;
@@ -126,6 +103,12 @@ export default function WeddingLocation({
       zoom: 17,
       minZoom: 11,
       maxZoom: 20,
+      scrollWheel: false,
+      pinchZoom: false,
+      disableDoubleClickZoom: true,
+      disableDoubleTapZoom: true,
+      disableTwoFingerTapZoom: true,
+      keyboardShortcuts: false,
       zoomControl: true,
       zoomControlOptions: {
         position: maps.Position.TOP_RIGHT,
@@ -164,49 +147,12 @@ export default function WeddingLocation({
     };
   }, [latitude, longitude, mapStatus, venueName]);
 
-  useEffect(() => {
-    return () => {
-      if (copiedTimerRef.current !== null) {
-        window.clearTimeout(copiedTimerRef.current);
-      }
-    };
-  }, []);
-
-  const copyAddress = async () => {
-    try {
-      await navigator.clipboard.writeText(address);
-    } catch {
-      const textarea = document.createElement('textarea');
-      textarea.value = address;
-      textarea.setAttribute('readonly', '');
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      textarea.remove();
-    }
-
-    setIsCopied(true);
-
-    if (copiedTimerRef.current !== null) {
-      window.clearTimeout(copiedTimerRef.current);
-    }
-
-    copiedTimerRef.current = window.setTimeout(() => {
-      setIsCopied(false);
-    }, 1600);
-  };
-
   const encodedVenueName = encodeURIComponent(venueName);
   const naverMapUrl = `https://map.naver.com/p/search/${encodedVenueName}`;
 
   return (
     <section
-      ref={sectionRef}
-      className={`${GowunDodum.className} flex w-full flex-col items-center bg-white px-5 pt-14 text-[#333333] transition-[opacity,transform] duration-800 max-[360px]:px-4 motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none ${
-        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-      }`}
+      className={`${GowunDodum.className} flex w-full flex-col items-center bg-white px-5 pt-14 text-[#333333]`}
       aria-labelledby="wedding-location-title"
     >
       <Script
@@ -219,20 +165,7 @@ export default function WeddingLocation({
         onError={() => setMapStatus('error')}
       />
 
-      <Image
-        className="mx-auto mb-5 block h-auto w-30.5 object-contain"
-        src="/images/message/decoration_ribbon.png"
-        alt=""
-        width={134}
-        height={40}
-      />
-
-      <h2
-        id="wedding-location-title"
-        className="m-0 text-center text-2xl font-semibold leading-normal tracking-[-0.045em]"
-      >
-        오시는 길
-      </h2>
+      <WeddingSectionHeader id="wedding-location-title" title="오시는 길" />
 
       <div className="mt-6.75 flex flex-col items-center gap-0.5 text-center">
         <p className="m-0 text-lg font-semibold leading-[1.65] tracking-[-0.04em]">
@@ -247,24 +180,25 @@ export default function WeddingLocation({
         <p className="m-0 text-lg font-normal leading-[1.65] tracking-[-0.04em]">
           {address}
         </p>
-        <button
-          type="button"
-          className="m-0 flex h-7 w-7 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-[#777777] [-webkit-tap-highlight-color:transparent] hover:text-[#333333] focus-visible:text-[#333333] focus-visible:outline-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:fill-none [&_svg]:stroke-current [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round] [&_svg]:stroke-[1.45]"
-          onClick={copyAddress}
-          aria-label="식장 주소 복사"
-        >
-          <Copy />
-        </button>
+        <CopyToClipboard
+          text={address}
+          onCopy={(_, copied) => {
+            if (copied) {
+              toast.success('주소가 복사되었습니다.');
+              return;
+            }
 
-        <span
-          className={`pointer-events-none absolute left-1/2 top-[calc(100%+8px)] z-4 -translate-x-1/2 whitespace-nowrap rounded bg-[rgba(51,51,51,0.92)] px-2.5 py-1.75 text-[11px] font-normal leading-none text-white transition-[opacity,transform] duration-200 motion-reduce:transform-none motion-reduce:transition-none ${
-            isCopied ? 'translate-y-0 opacity-100' : '-translate-y-1 opacity-0'
-          }`}
-          role="status"
-          aria-live="polite"
+            toast.error('복사에 실패했습니다.');
+          }}
         >
-          주소가 복사되었습니다.
-        </span>
+          <button
+            type="button"
+            className="m-0 flex h-7 w-7 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-[#777777] [-webkit-tap-highlight-color:transparent] hover:text-[#333333] focus-visible:text-[#333333] focus-visible:outline-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:fill-none [&_svg]:stroke-current [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round] [&_svg]:stroke-[1.45]"
+            aria-label="식장 주소 복사"
+          >
+            <Copy />
+          </button>
+        </CopyToClipboard>
       </div>
 
       <div className="relative mt-7 w-full overflow-hidden">
@@ -276,7 +210,7 @@ export default function WeddingLocation({
 
         {mapStatus !== 'ready' ? (
           <div
-            className="absolute inset-x-0 bottom-14 top-0 z-2 flex flex-col items-center justify-center gap-2 bg-[#f3f2f0] text-center text-[12px] font-normal leading-normal text-[#777777] [&_a]:font-medium [&_a]:text-[#333333] [&_a]:underline [&_a]:underline-offset-[3px]"
+            className="absolute inset-x-0 bottom-14 top-0 z-2 flex flex-col items-center justify-center gap-2 bg-[#f3f2f0] text-center leading-normal text-[#777777] [&_a]:font-medium [&_a]:text-[#333333] [&_a]:underline [&_a]:underline-offset-[3px]"
             aria-live="polite"
           >
             {mapStatus === 'error' ? (

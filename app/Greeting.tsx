@@ -1,6 +1,7 @@
-import Image from 'next/image';
-import { ChosunNm, GowunDodum } from './lib/fonts';
+import WeddingRibbon from './components/common/WeddingRibbon';
+import { GowunDodum } from './lib/fonts';
 import Divider from './Divider';
+import Image from 'next/image';
 
 const greetingMessages = [
   {
@@ -46,12 +47,7 @@ export default function Greeting(): React.ReactElement {
     <section
       className={`mt-14 flex pb-14 flex-col items-center ${GowunDodum.className}`}
     >
-      <Image
-        src="/images/message/decoration_ribbon.png"
-        alt="장식 리본"
-        width={134}
-        height={40}
-      />
+      <WeddingRibbon />
 
       <div className="mt-8 text-center">
         <p>“예쁜 예감이 들었다.</p>

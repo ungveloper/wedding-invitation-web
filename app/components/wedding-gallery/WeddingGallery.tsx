@@ -1,9 +1,17 @@
 'use client';
 
+import {
+  motion,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from 'framer-motion';
 import Image from 'next/image';
 import {
   type CSSProperties,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+  type RefObject,
   useCallback,
   useEffect,
   useMemo,
@@ -11,6 +19,7 @@ import {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
+import WeddingSectionHeader from '../common/WeddingSectionHeader';
 import { GowunDodum } from '../../lib/fonts';
 
 type WeddingGalleryImage = {
@@ -25,7 +34,6 @@ type WeddingGalleryProps = {
 
 type PolaroidStyle = CSSProperties & {
   '--polaroid-rotation': string;
-  '--reveal-delay': string;
 };
 
 const DEFAULT_IMAGES: readonly WeddingGalleryImage[] = [
@@ -57,16 +65,16 @@ const SWIPE_THRESHOLD = 48;
 
 const POLAROID_ITEM_CLASS_NAME = [
   'block w-full min-w-0 m-0 border-0 p-0',
-  'cursor-pointer bg-transparent text-inherit opacity-0',
-  'origin-center rotate-[var(--polaroid-rotation)] translate-y-3',
-  '[transition:opacity_0.55s_var(--reveal-delay),transform_0.55s_var(--reveal-delay),filter_0.25s]',
+  'cursor-pointer bg-transparent text-inherit',
+  'origin-center rotate-[var(--polaroid-rotation)]',
+  'transition-[transform,filter] duration-250',
   '[-webkit-tap-highlight-color:transparent]',
   'hover:z-[2] hover:-translate-y-1 hover:scale-[1.018] hover:outline-none',
   'hover:drop-shadow-[0_8px_10px_rgb(0_0_0/11%)]',
   'focus-visible:z-[2] focus-visible:-translate-y-1 focus-visible:scale-[1.018]',
   'focus-visible:outline-none focus-visible:drop-shadow-[0_8px_10px_rgb(0_0_0/11%)]',
   'active:-translate-y-px active:scale-[0.99]',
-  'motion-reduce:opacity-100 motion-reduce:translate-y-0 motion-reduce:[transition:none]',
+  'motion-reduce:[transition:none]',
   'motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100',
   'motion-reduce:focus-visible:translate-y-0 motion-reduce:focus-visible:scale-100',
   'motion-reduce:active:translate-y-0 motion-reduce:active:scale-100',
@@ -78,13 +86,100 @@ const LIGHTBOX_BUTTON_CLASS_NAME = [
   '[-webkit-tap-highlight-color:transparent]',
 ].join(' ');
 
+type GalleryMotionItemProps = {
+  index: number;
+  containerRef: RefObject<HTMLDivElement | null>;
+  progress: MotionValue<number>;
+  children: ReactNode;
+};
+
+function GalleryMotionItem({
+  index,
+  containerRef,
+  progress,
+  children,
+}: GalleryMotionItemProps): React.ReactElement {
+  const itemRef = useRef<HTMLDivElement | null>(null);
+  const [range, setRange] = useState({
+    start: 0,
+    end: 1,
+  });
+
+  useEffect(() => {
+    const containerElement = containerRef.current;
+    const itemElement = itemRef.current;
+
+    if (!containerElement || !itemElement) {
+      return;
+    }
+
+    const calculateRange = (): void => {
+      const containerRect = containerElement.getBoundingClientRect();
+      const itemRect = itemElement.getBoundingClientRect();
+      const containerHeight = containerRect.height || 1;
+
+      const itemTop = itemRect.top - containerRect.top;
+      const itemBottom = itemRect.bottom - containerRect.top;
+
+      const start = Math.max(0, Math.min(1, itemTop / containerHeight - 0.12));
+
+      const end = Math.max(0, Math.min(1, itemBottom / containerHeight - 0.04));
+
+      setRange({
+        start,
+        end: Math.max(start + 0.01, end),
+      });
+    };
+
+    calculateRange();
+
+    const resizeObserver = new ResizeObserver(calculateRange);
+
+    resizeObserver.observe(containerElement);
+    resizeObserver.observe(itemElement);
+    window.addEventListener('resize', calculateRange);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', calculateRange);
+    };
+  }, [containerRef]);
+
+  const isLeft = index % 2 === 0;
+
+  const opacity = useTransform(progress, [range.start, range.end], [0, 1]);
+
+  const x = useTransform(
+    progress,
+    [range.start, range.end],
+    [isLeft ? -50 : 50, 0],
+  );
+
+  const y = useTransform(progress, [range.start, range.end], [50, 0]);
+
+  return (
+    <motion.div
+      ref={itemRef}
+      className="w-full min-w-0 will-change-transform"
+      style={{ opacity, x, y }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 export default function WeddingGallery({
   title = '웨딩 갤러리',
   images = DEFAULT_IMAGES,
 }: WeddingGalleryProps): React.ReactElement {
-  const sectionRef = useRef<HTMLElement>(null);
   const pointerStartXRef = useRef<number | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const galleryContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: galleryContainerRef,
+    offset: ['start center', 'end center'],
+  });
+
   const [isLightboxVisible, setIsLightboxVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const portalRoot = typeof document === 'undefined' ? null : document.body;
@@ -123,28 +218,6 @@ export default function WeddingGallery({
       return (currentIndex + 1) % galleryImages.length;
     });
   }, [galleryImages.length]);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-
-    if (!section) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.12 },
-    );
-
-    observer.observe(section);
-
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     if (selectedIndex === null) {
@@ -330,7 +403,7 @@ export default function WeddingGallery({
               ) : null}
 
               <span
-                className="absolute top-[calc(100%+17px)] left-1/2 -translate-x-1/2 text-[12px] leading-none font-medium tracking-[0.08em] text-white/86"
+                className="absolute top-[calc(100%+17px)] left-1/2 -translate-x-1/2 leading-none font-medium tracking-[0.08em] text-white/86"
                 aria-live="polite"
               >
                 {selectedIndex + 1} / {galleryImages.length}
@@ -344,68 +417,58 @@ export default function WeddingGallery({
   return (
     <>
       <section
-        ref={sectionRef}
-        className={`flex w-full translate-y-6 flex-col items-center box-border m-0 px-5 pt-14 pb-12 text-[#333333] opacity-0 [transition:opacity_0.8s,transform_0.8s] max-[360px]:px-4 motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:[transition:none] ${
-          isVisible ? 'translate-y-0 opacity-100' : ''
-        } ${GowunDodum.className}`}
+        className={`m-0 box-border flex w-full flex-col items-center px-5 pt-14 pb-12 text-[#333333] ${GowunDodum.className} overflow-hidden`}
         aria-labelledby="wedding-gallery-title"
       >
-        <Image
-          className="mx-auto mb-5 block h-auto w-30.5 object-contain"
-          src="/images/message/decoration_ribbon.png"
-          alt=""
-          width={134}
-          height={40}
+        <WeddingSectionHeader
+          id="wedding-gallery-title"
+          title={title}
+          className="mb-8.5"
         />
 
-        <header className="mb-8.5 block w-full text-center">
-          <h2
-            id="wedding-gallery-title"
-            className="m-0 text-2xl leading-normal font-semibold tracking-[-0.045em]"
-          >
-            {title}
-          </h2>
-        </header>
-
-        <div className="w-full box-border">
-          <div className="grid w-full grid-cols-2 items-start gap-x-5 gap-y-6.5 max-[360px]:gap-x-3.5 max-[360px]:gap-y-5.5">
+        <div ref={galleryContainerRef} className="w-full box-border">
+          <div className="grid w-full grid-cols-2 items-start gap-x-5 gap-y-6.5">
             {galleryImages.map((image, index) => {
               const itemStyle: PolaroidStyle = {
                 '--polaroid-rotation': `${
                   POLAROID_ROTATIONS[index % POLAROID_ROTATIONS.length]
                 }deg`,
-                '--reveal-delay': `${Math.min(index * 0.055, 0.4)}s`,
               };
 
               return (
-                <button
+                <GalleryMotionItem
                   key={`${image.src}-${index}`}
-                  className={`${POLAROID_ITEM_CLASS_NAME} ${
-                    isVisible ? 'translate-y-0 opacity-100' : ''
-                  }`}
-                  style={itemStyle}
-                  type="button"
-                  onClick={() => openLightbox(index)}
-                  aria-label={`${image.alt} 크게 보기`}
+                  index={index}
+                  containerRef={galleryContainerRef}
+                  progress={scrollYProgress}
                 >
-                  <span className="block w-full box-border bg-white px-2 pt-2 pb-0 shadow-[0_2px_7px_rgb(0_0_0/10%),0_1px_2px_rgb(0_0_0/7%)] max-[360px]:px-1.75 max-[360px]:pt-1.75">
-                    <span className="relative block aspect-3/4 w-full overflow-hidden bg-[#e9e8e6]">
-                      <Image
-                        className="object-cover object-center select-none [-webkit-user-drag:none]"
-                        src={image.src}
-                        alt={image.alt}
-                        fill
-                        sizes="(max-width: 448px) 42vw, 176px"
-                        loading="lazy"
-                        draggable={false}
+                  <button
+                    className={POLAROID_ITEM_CLASS_NAME}
+                    style={itemStyle}
+                    type="button"
+                    onClick={() => openLightbox(index)}
+                    aria-label={`${image.alt} 크게 보기`}
+                  >
+                    <span className="block w-full box-border bg-white px-2 pt-2 pb-0 shadow-[0_2px_7px_rgb(0_0_0/10%),0_1px_2px_rgb(0_0_0/7%)]">
+                      <span className="relative block aspect-3/4 w-full overflow-hidden bg-[#e9e8e6]">
+                        <Image
+                          className="object-cover object-center select-none [-webkit-user-drag:none]"
+                          src={image.src}
+                          alt={image.alt}
+                          fill
+                          sizes="(max-width: 448px) 42vw, 176px"
+                          loading="lazy"
+                          draggable={false}
+                        />
+                      </span>
+
+                      <span
+                        className="block h-6.25 w-full bg-white"
+                        aria-hidden="true"
                       />
                     </span>
-                    <span
-                      className="block h-6.25 w-full bg-white max-[360px]:h-5.5"
-                      aria-hidden="true"
-                    />
-                  </span>
-                </button>
+                  </button>
+                </GalleryMotionItem>
               );
             })}
           </div>
