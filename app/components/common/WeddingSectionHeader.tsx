@@ -1,3 +1,5 @@
+import { GowunDodum } from '@/app/lib/fonts';
+import FadeInUp from './FadeInUp';
 import WeddingRibbon from './WeddingRibbon';
 
 type WeddingSectionHeaderProps = {
@@ -13,14 +15,18 @@ export default function WeddingSectionHeader({
 }: WeddingSectionHeaderProps): React.ReactElement {
   return (
     <header className={`block w-full text-center ${className}`.trim()}>
-      <WeddingRibbon />
+      <FadeInUp>
+        <WeddingRibbon />
+      </FadeInUp>
 
-      <h2
-        id={id}
-        className="m-0 text-center text-2xl font-semibold leading-normal tracking-[-0.045em]"
-      >
-        {title}
-      </h2>
+      <FadeInUp>
+        <h2
+          id={id}
+          className={`m-0 ${GowunDodum.className}text-center text-2xl leading-normal tracking-[-0.045em]`}
+        >
+          {title}
+        </h2>
+      </FadeInUp>
     </header>
   );
 }

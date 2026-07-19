@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { toast } from 'sonner';
+import FadeInUp from '../common/FadeInUp';
 import WeddingSectionHeader from '../common/WeddingSectionHeader';
 
 export type WeddingAccount = {
@@ -66,79 +68,147 @@ export default function WeddingAccounts({
 }: WeddingAccountsProps): React.ReactElement {
   return (
     <section
-      className="relative box-border flex w-full flex-col items-center px-5 py-10 font-[Pretendard,-apple-system,BlinkMacSystemFont,'Apple_SD_Gothic_Neo','Noto_Sans_KR',sans-serif] text-[#333333]"
+      className="relative box-border flex w-full flex-col items-center px-5 py-10 text-[#333333]"
       aria-labelledby="wedding-accounts-title"
     >
-      <WeddingSectionHeader id="wedding-accounts-title" title={title} />
+      <WeddingSectionHeader
+        id="wedding-accounts-title"
+        className="space-y-5"
+        title={title}
+      />
 
-      <ul className="mt-8.5 flex w-full list-none flex-col p-0">
-        <AccountAccordion title="신랑측 계좌번호" accounts={groomAccounts} />
-        <AccountAccordion title="신부측 계좌번호" accounts={brideAccounts} />
+      <ul className="mt-8.5 flex w-full list-none flex-col gap-2 p-0">
+        <FadeInUp>
+          <AccountAccordion
+            id="groom-accounts"
+            title="신랑측 계좌번호"
+            accounts={groomAccounts}
+            defaultOpen
+          />
+        </FadeInUp>
+        <FadeInUp>
+          <AccountAccordion
+            id="bride-accounts"
+            title="신부측 계좌번호"
+            accounts={brideAccounts}
+            defaultOpen
+          />
+        </FadeInUp>
       </ul>
     </section>
   );
 }
 
 type AccountAccordionProps = {
+  id: string;
   title: string;
   accounts: WeddingAccount[];
+  defaultOpen?: boolean;
 };
 
 function AccountAccordion({
+  id,
   title,
   accounts,
+  defaultOpen = false,
 }: AccountAccordionProps): React.ReactElement {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  const buttonId = `${id}-button`;
+  const contentId = `${id}-content`;
+
   return (
-    <li className="mb-2 w-full overflow-hidden">
-      <div className="flex min-h-13.5 w-full items-center bg-[#f1f0ee] px-4.25 text-left text-xl font-medium leading-normal tracking-[-0.04em] text-[#333333]">
-        {title}
-      </div>
+    <li className="w-full overflow-hidden">
+      <button
+        id={buttonId}
+        type="button"
+        className="flex min-h-13.5 w-full cursor-pointer items-center justify-between bg-[#f1f0ee] px-4.25 text-left text-xl font-medium leading-normal tracking-[-0.04em] text-[#333333]"
+        aria-expanded={isOpen}
+        aria-controls={contentId}
+        onClick={() => {
+          setIsOpen((previous) => !previous);
+        }}
+      >
+        <span>{title}</span>
 
-      <div className="px-4 pb-4">
-        {accounts.map((account) => {
-          const copyValue = `${account.bank} ${account.accountNumber}`;
+        <svg
+          className={`size-5 shrink-0 transition-transform duration-350 ${
+            isOpen ? 'rotate-180' : 'rotate-0'
+          }`}
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="m6 9 6 6 6-6"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
 
-          return (
-            <article
-              key={account.id}
-              className="flex w-full items-center justify-between gap-4 py-4 [&+&]:border-t [&+&]:border-[#e4e2df]"
-            >
-              <div className="flex min-w-0 flex-1 flex-col">
-                <span className="block text-xl font-bold leading-normal tracking-[-0.045em] text-[#333333]">
-                  {account.role}
-                </span>
+      <div
+        id={contentId}
+        role="region"
+        aria-labelledby={buttonId}
+        className={`grid transition-[grid-template-rows] duration-350 ease-out ${
+          isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div
+            className={`px-4 transition-[padding] duration-350 ease-out ${
+              isOpen ? 'pb-4' : 'pb-0'
+            }`}
+          >
+            {accounts.map((account) => {
+              const copyValue = `${account.bank} ${account.accountNumber}`;
 
-                <span className="mt-1.5 block break-all text-lg leading-normal tracking-tight text-[#333333]">
-                  {account.accountNumber}
-                </span>
-
-                <span className="mt-1 block font-normal leading-normal tracking-[-0.035em] text-[#777777]">
-                  {account.bank} {account.holder}
-                </span>
-              </div>
-
-              <CopyToClipboard
-                text={copyValue}
-                onCopy={(_, copied) => {
-                  if (copied) {
-                    toast.success('은행명과 계좌번호가 복사되었습니다.');
-                    return;
-                  }
-
-                  toast.error('복사에 실패했습니다.');
-                }}
-              >
-                <button
-                  type="button"
-                  className="m-0 shrink-0 cursor-pointer whitespace-nowrap rounded-xs border border-[#d7d4d0] bg-white px-5 py-1.75 text-[#555555]"
-                  aria-label={`${account.role} ${account.bank} ${account.accountNumber} 복사`}
+              return (
+                <article
+                  key={account.id}
+                  className="flex w-full items-center justify-between gap-4 py-4 [&+&]:border-t [&+&]:border-[#e4e2df]"
                 >
-                  복사하기
-                </button>
-              </CopyToClipboard>
-            </article>
-          );
-        })}
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <span className="block text-lg tracking-[-0.045em] text-[#333333]">
+                      {account.role}
+                    </span>
+
+                    <span className="mt-1.5 block break-all text-lg leading-normal tracking-tight text-[#333333]">
+                      {account.accountNumber}
+                    </span>
+
+                    <span className="mt-1 block font-normal leading-normal tracking-[-0.035em] text-[#777777]">
+                      {account.bank} {account.holder}
+                    </span>
+                  </div>
+
+                  <CopyToClipboard
+                    text={copyValue}
+                    onCopy={(_, copied) => {
+                      if (copied) {
+                        toast.success('은행명과 계좌번호가 복사되었습니다.');
+                        return;
+                      }
+
+                      toast.error('복사에 실패했습니다.');
+                    }}
+                  >
+                    <button
+                      type="button"
+                      className="m-0 shrink-0 cursor-pointer whitespace-nowrap rounded-md border border-[#d7d4d0] bg-[#f1f0ed] px-3 py-1 text-[#555555]"
+                      aria-label={`${account.role} ${account.bank} ${account.accountNumber} 복사`}
+                    >
+                      복사하기
+                    </button>
+                  </CopyToClipboard>
+                </article>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </li>
   );

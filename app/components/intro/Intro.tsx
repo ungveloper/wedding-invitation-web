@@ -46,6 +46,17 @@ export type IntroProps = {
   /** 인트로가 닫혀 있는 동안 본문 스크롤을 막습니다. */
   lockScroll?: boolean;
 
+  /**
+   * 커튼이 완전히 열리기 직전에 실행됩니다.
+   * 실행 시점은 preOpenOffset으로 지정합니다.
+   */
+  onBeforeOpen?: () => void;
+
+  /**
+   * onBeforeOpen을 커튼 종료 몇 초 전에 실행할지 지정합니다.
+   */
+  preOpenOffset?: number;
+
   /** 커튼이 완전히 열린 다음 실행됩니다. */
   onOpen?: () => void;
 };

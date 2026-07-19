@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import WeddingRibbon from '../common/WeddingRibbon';
 import { GowunDodum } from '../../lib/fonts';
+import FadeInUp from '../common/FadeInUp';
+import WeddingRibbon from '../common/WeddingRibbon';
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 const KOREA_TIME_OFFSET = 9 * 60 * 60 * 1000;
@@ -130,8 +131,8 @@ function createCalendarCells(
 
 export default function WeddingCalendar({
   targetDate = '2026-09-20T12:00:00+09:00',
-  groomName = '지웅재',
-  brideName = '송혜정',
+  groomName = '웅재',
+  brideName = '혜정',
 }: WeddingCalendarProps): React.ReactElement {
   const [countdown, setCountdown] = useState<Countdown>(INITIAL_COUNTDOWN);
 
@@ -175,85 +176,99 @@ export default function WeddingCalendar({
       className={`${SECTION_BASE_CLASS} ${GowunDodum.className}`}
       aria-label={`${year}년 ${month + 1}월 ${day}일 예식 달력`}
     >
-      <WeddingRibbon />
+      <FadeInUp>
+        <WeddingRibbon />
+      </FadeInUp>
 
-      <header className="text-center">
-        <div className="text-[30px] leading-[1.2] font-black tracking-[-0.045em] tabular-nums">
-          {year}. {month + 1}. {day}
-        </div>
+      <FadeInUp>
+        <header className="text-center">
+          <div className="mt-5 text-[30px] leading-[1.2] font-black tracking-[-0.045em] tabular-nums">
+            {year}. {month + 1}. {day}
+          </div>
 
-        <p className="mt-3.5 text-lg leading-normal font-medium tracking-[-0.045em]">
-          <span>{KOREAN_WEEKDAYS[weekday]}</span> <span>{period}</span>{' '}
-          <span>{displayTime}</span>
-        </p>
-      </header>
+          <p className="mt-3.5 text-lg leading-normal font-medium tracking-[-0.045em]">
+            <span>{KOREAN_WEEKDAYS[weekday]}</span> <span>{period}</span>{' '}
+            <span>{displayTime}</span>
+          </p>
+        </header>
+      </FadeInUp>
 
-      <div className="mt-4.5 border-y border-[#e8e7e5] pt-6.5 pb-4">
-        <div
-          className="grid grid-cols-7 text-center text-sm leading-5 font-semibold"
-          aria-hidden="true"
-        >
-          {WEEKDAY_LABELS.map((label, index) => (
-            <span
-              key={label}
-              className={index === 0 ? 'text-[#ea3323]' : undefined}
-            >
-              {label}
-            </span>
-          ))}
-        </div>
-
-        <div className="mt-6 grid grid-cols-7 gap-y-1">
-          {calendarCells.map((cell) => {
-            const dateColorClass = cell.isWeddingDay
-              ? 'bg-[#333333] text-white font-bold'
-              : cell.isSunday
-                ? 'text-[#ea3323]'
-                : '';
-
-            return (
+      <FadeInUp>
+        <div className="mt-4.5 border-y border-[#e8e7e5] pt-6.5 pb-4">
+          <div
+            className="grid grid-cols-7 text-center text-sm leading-5 font-semibold"
+            aria-hidden="true"
+          >
+            {WEEKDAY_LABELS.map((label, index) => (
               <span
-                key={cell.key}
-                className={`mx-auto flex size-9 items-center justify-center rounded-full text-lg leading-none font-medium tabular-nums ${
-                  !cell.isCurrentMonth ? 'invisible' : ''
-                } ${dateColorClass}`}
-                aria-current={cell.isWeddingDay ? 'date' : undefined}
-                aria-hidden={!cell.isCurrentMonth || undefined}
+                key={label}
+                className={index === 0 ? 'text-[#ea3323]' : undefined}
               >
-                {cell.day}
+                {label}
               </span>
-            );
-          })}
+            ))}
+          </div>
+
+          <div className="mt-6 grid grid-cols-7 gap-y-1">
+            {calendarCells.map((cell) => {
+              const dateColorClass = cell.isWeddingDay
+                ? 'bg-[#333333] text-white font-bold'
+                : cell.isSunday
+                  ? 'text-[#ea3323]'
+                  : '';
+
+              return (
+                <span
+                  key={cell.key}
+                  className={`mx-auto flex size-9 items-center justify-center rounded-full text-lg leading-none font-medium tabular-nums ${
+                    !cell.isCurrentMonth ? 'invisible' : ''
+                  } ${dateColorClass}`}
+                  aria-current={cell.isWeddingDay ? 'date' : undefined}
+                  aria-hidden={!cell.isCurrentMonth || undefined}
+                >
+                  {cell.day}
+                </span>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </FadeInUp>
 
-      <div className={COUNTER_CLASS} aria-live="polite">
-        <CounterItem label="DAYS" value={countdown.days} />
-        <CounterDots />
-        <CounterItem label="HOUR" value={countdown.hours} />
-        <CounterDots />
-        <CounterItem label="MIN" value={countdown.minutes} />
-        <CounterDots />
-        <CounterItem label="SEC" value={countdown.seconds} />
-      </div>
+      <FadeInUp>
+        <div className={COUNTER_CLASS} aria-live="polite">
+          <CounterItem label="DAYS" value={countdown.days} />
+          <CounterDots />
+          <CounterItem label="HOUR" value={countdown.hours} />
+          <CounterDots />
+          <CounterItem label="MIN" value={countdown.minutes} />
+          <CounterDots />
+          <CounterItem label="SEC" value={countdown.seconds} />
+        </div>
+      </FadeInUp>
 
-      <div className="mt-7.75 text-center text-lg leading-normal font-medium tracking-[-0.045em] whitespace-nowrap">
-        {countdown.isPast && !countdown.isWeddingDay ? (
-          <span>함께해 주셔서 감사합니다.</span>
-        ) : countdown.isWeddingDay ? (
-          <span>
-            {groomName} <HeartIcon /> {brideName}의 결혼식이 오늘입니다.
-          </span>
-        ) : (
-          <span>
-            {groomName} <HeartIcon /> {brideName}의 결혼식이{' '}
-            <strong className="text-base font-bold text-[#ec5e2a]">
-              {countdown.calendarDays}일
-            </strong>{' '}
-            남았습니다.
-          </span>
-        )}
-      </div>
+      <FadeInUp>
+        <div className="mt-7.75 text-center text-lg leading-normal font-medium tracking-[-0.045em] whitespace-nowrap">
+          {countdown.isPast && !countdown.isWeddingDay ? (
+            <span>함께해 주셔서 감사합니다.</span>
+          ) : countdown.isWeddingDay ? (
+            <span>
+              {groomName}
+              <HeartIcon />
+              {brideName}의 결혼식이 오늘입니다.
+            </span>
+          ) : (
+            <span>
+              {groomName}
+              <HeartIcon />
+              {brideName}의 결혼식이{' '}
+              <strong className="font-bold text-[#ec5e2a]">
+                {countdown.calendarDays}일
+              </strong>{' '}
+              남았습니다.
+            </span>
+          )}
+        </div>
+      </FadeInUp>
     </section>
   );
 }

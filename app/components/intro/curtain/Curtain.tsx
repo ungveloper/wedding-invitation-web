@@ -30,16 +30,22 @@ export default function Curtain({
   curtainLeftImage = '/images/intro/curtain/veil-left.webp',
   curtainRightImage = '/images/intro/curtain/veil-right.webp',
   lockScroll = true,
+  preOpenOffset = 1,
+  onBeforeOpen,
   onOpen,
 }: IntroRendererProps): React.ReactElement | null {
   const [state, setState] = useState<CurtainState>('closed');
   const [isMounted, setIsMounted] = useState(true);
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const autoOpenStartedRef = useRef(false);
+  const beforeOpenTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const safeDuration = Number.isFinite(duration) ? Math.max(duration, 0) : 1.45;
   const safeDelay = Number.isFinite(delay) ? Math.max(delay, 0) : 0;
+
+  const safePreOpenOffset = Number.isFinite(preOpenOffset)
+    ? Math.max(preOpenOffset, 0)
+    : 1;
 
   useEffect(() => {
     if (!lockScroll || state === 'open') {
@@ -63,6 +69,10 @@ export default function Curtain({
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
+
+      if (beforeOpenTimerRef.current) {
+        clearTimeout(beforeOpenTimerRef.current);
+      }
     };
   }, []);
 
@@ -81,21 +91,36 @@ export default function Curtain({
       ? 20
       : (safeDelay + safeDuration) * 1000 + 120;
 
+    const beforeOpenMilliseconds = reduceMotion
+      ? 0
+      : Math.max(totalMilliseconds - safePreOpenOffset * 1000, 0);
+
+    if (onBeforeOpen) {
+      beforeOpenTimerRef.current = setTimeout(() => {
+        onBeforeOpen();
+      }, beforeOpenMilliseconds);
+    }
+
     timerRef.current = setTimeout(() => {
       setState('open');
       setIsMounted(false);
       onOpen?.();
     }, totalMilliseconds);
-  }, [onOpen, safeDelay, safeDuration, state]);
+  }, [onBeforeOpen, onOpen, safeDelay, safeDuration, safePreOpenOffset, state]);
 
   useEffect(() => {
-    if (!autoOpen || autoOpenStartedRef.current) {
+    if (!autoOpen || state !== 'closed') {
       return;
     }
 
-    autoOpenStartedRef.current = true;
-    handleOpen();
-  }, [autoOpen, handleOpen]);
+    const autoOpenTimer = window.setTimeout(() => {
+      handleOpen();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(autoOpenTimer);
+    };
+  }, [autoOpen, handleOpen, state]);
 
   const curtainStyle: CurtainStyle = {
     '--curtain-duration': `${safeDuration}s`,

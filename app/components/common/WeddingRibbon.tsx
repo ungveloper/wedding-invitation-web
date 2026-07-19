@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-const BASE_CLASS_NAME = 'mx-auto pb-5 block h-auto w-30.5 object-contain';
+const BASE_CLASS_NAME = 'mx-auto block h-auto w-30.5 object-contain';
 
 export default function WeddingRibbon(): React.ReactElement {
   return (

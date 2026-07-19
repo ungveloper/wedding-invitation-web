@@ -1,7 +1,7 @@
+import Image from 'next/image';
+import FadeInUp from './components/common/FadeInUp';
 import WeddingRibbon from './components/common/WeddingRibbon';
 import { GowunDodum } from './lib/fonts';
-import Divider from './Divider';
-import Image from 'next/image';
 
 const greetingMessages = [
   {
@@ -45,64 +45,125 @@ const greetingMessages = [
 export default function Greeting(): React.ReactElement {
   return (
     <section
-      className={`mt-14 flex pb-14 flex-col items-center ${GowunDodum.className}`}
+      className={`mt-14 flex flex-col items-center ${GowunDodum.className}`}
     >
-      <WeddingRibbon />
+      <FadeInUp>
+        <WeddingRibbon />
 
-      <div className="mt-8 text-center">
-        <p>“예쁜 예감이 들었다.</p>
-        <p>우리는 언제나 손을 잡고 있게 될 것이다.”</p>
-        <p className="mt-2">이이체, 〈연인〉 中</p>
-      </div>
+        <div className="mt-8 text-center">
+          <p>“예쁜 예감이 들었다.</p>
+          <p>우리는 언제나 손을 잡고 있게 될 것이다.”</p>
+          <p className="mt-2">- 이이체, 〈연인〉 -</p>
+        </div>
+      </FadeInUp>
 
-      <div className="my-10 w-[20vw] h-px bg-[repeating-linear-gradient(to_right,#999_0_4px,transparent_4px_10px)] bg-size-[100%_2px] bg-bottom bg-no-repeat" />
+      <FadeInUp>
+        <div className="mx-auto my-10 w-[20vw] h-px bg-[repeating-linear-gradient(to_right,#999_0_4px,transparent_4px_10px)] bg-size-[100%_2px] bg-bottom bg-no-repeat" />
+      </FadeInUp>
 
-      <div className="px-5 w-full space-y-1.5 text-center text-[17px]">
-        {greetingMessages.map((message) => (
-          <p
-            key={message.id}
-            className={message.id >= 8 ? 'font-bold opacity-80' : ''}
-          >
-            {message.text}
-          </p>
-        ))}
-      </div>
+      <FadeInUp>
+        <div className="px-5 w-full space-y-1.5 text-center text-[17px]">
+          {greetingMessages.map((message) => (
+            <p
+              key={message.id}
+              className={[
+                message.id >= 8 ? 'opacity-100' : 'opacity-80',
+                message.id === 5 ? 'mb-6' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              {message.text}
+            </p>
+          ))}
+        </div>
+      </FadeInUp>
 
+      <FadeInUp>
+        <div className="mx-auto mt-14 py-5 w-[66.6%] border-y border-y-gray-200">
+          <div className="grid grid-cols-[auto_auto_auto] justify-center items-center gap-x-4 gap-y-3 text-[17px]">
+            <p className="justify-self-center">
+              <span>지정호</span>·<span>박순영</span>의
+            </p>
+            <p className="justify-self-center text-sm">아들</p>
+            <p>웅재</p>
+            <p className="justify-self-center">
+              <span>송종무</span>·<span>지경화</span>의
+            </p>
+            <p className="justify-self-center text-sm">딸</p>
+            <p>혜정</p>
+          </div>
+        </div>
+      </FadeInUp>
+
+      {/* 
       <Divider />
-
+      
       <div
         className={`px-3 w-full grid grid-cols-2 gap-x-3 ${GowunDodum.className}`}
       >
-        {/* 신랑 */}
         <div>
-          <div className="relative w-full aspect-square rounded-md overflow-clip shadow-md">
-            <Image src={`/images/profiles/groom.png`} alt="groom" fill />
+          <div className="relative aspect-square w-full overflow-clip rounded-md shadow-md select-none [-webkit-touch-callout:none]">
+            <Image
+              src="/images/profiles/groom.png"
+              alt="groom"
+              fill
+              draggable={false}
+              className="pointer-events-none select-none object-cover [-webkit-user-drag:none]"
+            />
+
+            <div
+              className="absolute inset-0 z-10 touch-none select-none [-webkit-touch-callout:none]"
+              aria-hidden="true"
+            />
           </div>
 
           <div className="mt-4 flex flex-col items-center gap-1">
             <div className="flex justify-center items-end gap-1">
               <span>신랑</span>
-              <p className="font-bold text-lg">지웅재</p>
+              <p className="font-bold text-lg">웅재</p>
             </div>
             <p className="text-sm">지정호·박순영의 장남</p>
           </div>
         </div>
 
-        {/* 신부 */}
         <div>
-          <div className="relative w-full aspect-square rounded-md overflow-clip shadow-md">
-            <Image src={`/images/profiles/bride.png`} alt="bride" fill />
-          </div>
+          <div className="relative aspect-square w-full overflow-clip rounded-md shadow-md select-none [-webkit-touch-callout:none]">
+            <Image
+              src="/images/profiles/bride.png"
+              alt="bride"
+              fill
+              draggable={false}
+              className="pointer-events-none select-none object-cover [-webkit-user-drag:none]"
+            />
 
+            <div
+              className="absolute inset-0 z-10 touch-none select-none [-webkit-touch-callout:none]"
+              aria-hidden="true"
+            />
+          </div>
           <div className="mt-4 flex flex-col items-center gap-1">
             <div className="flex justify-center items-end gap-1">
               <span>신부</span>
-              <p className="font-bold text-lg">송혜정</p>
+              <p className="font-bold text-lg">혜정</p>
             </div>
             <p className="text-sm">송종무·지경화의 차녀</p>
           </div>
         </div>
       </div>
+       */}
+
+      <FadeInUp>
+        <div className="relative mx-auto mt-8 w-[66.6%] aspect-9/4">
+          <Image
+            src="/images/message/heart.png"
+            alt="heart"
+            fill
+            draggable={false}
+            className="pointer-events-none select-none object-cover [-webkit-user-drag:none]"
+          />
+        </div>
+      </FadeInUp>
     </section>
   );
 }
