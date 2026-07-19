@@ -9,44 +9,40 @@
   --aspect-cover: 100 / 178;
 
   /*
-   * Intro 설정:
-   * delay 0.2초 + duration 1.45초 + 제거 여유 시간 약 0.12초
-   *
-   * 따라서 1.9초 뒤에 tada를 실행합니다.
+   * 5초 후 최초 실행
+   * tada 동작 1초 + 정지 3초 = 총 4초 주기
    */
-  --animate-tada: tada 1s ease 5s both;
+  --animate-tada: tada 4s ease 5s infinite both;
 
   @keyframes tada {
-    0% {
+    0%,
+    25%,
+    100% {
       transform: scale3d(1, 1, 1);
     }
 
-    10%,
-    20% {
+    2.5%,
+    5% {
       transform:
         scale3d(0.9, 0.9, 0.9)
         rotate3d(0, 0, 1, -3deg);
     }
 
-    30%,
-    50%,
-    70%,
-    90% {
+    7.5%,
+    12.5%,
+    17.5%,
+    22.5% {
       transform:
         scale3d(1.1, 1.1, 1.1)
         rotate3d(0, 0, 1, 3deg);
     }
 
-    40%,
-    60%,
-    80% {
+    10%,
+    15%,
+    20% {
       transform:
         scale3d(1.1, 1.1, 1.1)
         rotate3d(0, 0, 1, -3deg);
-    }
-
-    100% {
-      transform: scale3d(1, 1, 1);
     }
   }
 }

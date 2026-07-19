@@ -6,39 +6,35 @@ import { GowunDodum } from './lib/fonts';
 const greetingMessages = [
   {
     id: 1,
-    text: '잡은 손의 온기가 서로의 마음을',
+    text: '서로를 만나기 전보다',
   },
   {
     id: 2,
-    text: '가장 먼저 알아채는 사람이 되겠습니다.',
+    text: '더 나은 내일을 꿈꾸게 되었습니다.',
   },
   {
     id: 3,
-    text: '좋은 날에는 그 손을 흔들며 함께 웃고,',
+    text: '부족한 부분을 채워주고,',
   },
   {
     id: 4,
-    text: '고단한 날에는 더 꽉 맞잡아',
+    text: '잘하는 부분은 아낌없이 응원하며',
   },
   {
     id: 5,
-    text: '서로의 무게를 나누어 짊어지겠습니다.',
+    text: '매일 조금씩 더 좋은 사람이 되어',
   },
   {
     id: 6,
-    text: '어떤 풍경 속에서도',
+    text: '곁을 지키겠습니다.',
   },
   {
     id: 7,
-    text: '결코 이 손을 놓지 않겠다는 약속,',
+    text: '저희 두 사람이 하나로 거듭나는 날,',
   },
   {
     id: 8,
-    text: '저희 두 사람의 눈부신 시작에',
-  },
-  {
-    id: 9,
-    text: '다정한 증인이 되어주세요.',
+    text: '함께해 주시길 바랍니다.',
   },
 ];
 
@@ -51,9 +47,8 @@ export default function Greeting(): React.ReactElement {
         <WeddingRibbon />
 
         <div className="mt-8 text-center">
-          <p>“예쁜 예감이 들었다.</p>
-          <p>우리는 언제나 손을 잡고 있게 될 것이다.”</p>
-          <p className="mt-2">- 이이체, 〈연인〉 -</p>
+          <p>“당신은 내가 더 좋은 사람이 되고 싶게 만들어요.”</p>
+          <p className="mt-2">- 영화 〈이보다 더 좋을 순 없다〉 -</p>
         </div>
       </FadeInUp>
 
@@ -68,7 +63,7 @@ export default function Greeting(): React.ReactElement {
               key={message.id}
               className={[
                 message.id >= 8 ? 'opacity-100' : 'opacity-80',
-                message.id === 5 ? 'mb-6' : '',
+                message.id === 2 || message.id === 6 ? 'mb-6' : '',
               ]
                 .filter(Boolean)
                 .join(' ')}
@@ -95,63 +90,6 @@ export default function Greeting(): React.ReactElement {
           </div>
         </div>
       </FadeInUp>
-
-      {/* 
-      <Divider />
-      
-      <div
-        className={`px-3 w-full grid grid-cols-2 gap-x-3 ${GowunDodum.className}`}
-      >
-        <div>
-          <div className="relative aspect-square w-full overflow-clip rounded-md shadow-md select-none [-webkit-touch-callout:none]">
-            <Image
-              src="/images/profiles/groom.png"
-              alt="groom"
-              fill
-              draggable={false}
-              className="pointer-events-none select-none object-cover [-webkit-user-drag:none]"
-            />
-
-            <div
-              className="absolute inset-0 z-10 touch-none select-none [-webkit-touch-callout:none]"
-              aria-hidden="true"
-            />
-          </div>
-
-          <div className="mt-4 flex flex-col items-center gap-1">
-            <div className="flex justify-center items-end gap-1">
-              <span>신랑</span>
-              <p className="font-bold text-lg">웅재</p>
-            </div>
-            <p className="text-sm">지정호·박순영의 장남</p>
-          </div>
-        </div>
-
-        <div>
-          <div className="relative aspect-square w-full overflow-clip rounded-md shadow-md select-none [-webkit-touch-callout:none]">
-            <Image
-              src="/images/profiles/bride.png"
-              alt="bride"
-              fill
-              draggable={false}
-              className="pointer-events-none select-none object-cover [-webkit-user-drag:none]"
-            />
-
-            <div
-              className="absolute inset-0 z-10 touch-none select-none [-webkit-touch-callout:none]"
-              aria-hidden="true"
-            />
-          </div>
-          <div className="mt-4 flex flex-col items-center gap-1">
-            <div className="flex justify-center items-end gap-1">
-              <span>신부</span>
-              <p className="font-bold text-lg">혜정</p>
-            </div>
-            <p className="text-sm">송종무·지경화의 차녀</p>
-          </div>
-        </div>
-      </div>
-       */}
 
       <HeartImage />
     </section>
