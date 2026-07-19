@@ -30,20 +30,20 @@ type PolaroidStyle = CSSProperties & {
 };
 
 const DEFAULT_IMAGES: readonly WeddingGalleryImage[] = [
-  { src: '/images/gallery/nnnew-1.png', alt: '웨딩 갤러리 이미지 1' },
-  { src: '/images/gallery/nnnew-2.png', alt: '웨딩 갤러리 이미지 2' },
-  { src: '/images/gallery/nnnew-3.png', alt: '웨딩 갤러리 이미지 3' },
-  { src: '/images/gallery/nnnew-4.png', alt: '웨딩 갤러리 이미지 4' },
-  { src: '/images/gallery/nnnew-5.png', alt: '웨딩 갤러리 이미지 5' },
-  { src: '/images/gallery/nnnew-6.png', alt: '웨딩 갤러리 이미지 6' },
-  { src: '/images/gallery/nnnew-7.png', alt: '웨딩 갤러리 이미지 7' },
-  { src: '/images/gallery/nnnew-8.png', alt: '웨딩 갤러리 이미지 8' },
-  { src: '/images/gallery/nnnew-9.png', alt: '웨딩 갤러리 이미지 9' },
-  { src: '/images/gallery/nnnew-10.png', alt: '웨딩 갤러리 이미지 10' },
-  { src: '/images/gallery/nnnew-11.png', alt: '웨딩 갤러리 이미지 11' },
-  { src: '/images/gallery/nnnew-12.png', alt: '웨딩 갤러리 이미지 12' },
-  { src: '/images/gallery/nnnew-13.png', alt: '웨딩 갤러리 이미지 13' },
-  { src: '/images/gallery/nnnew-14.png', alt: '웨딩 갤러리 이미지 14' },
+  { src: '/images/gallery/1.png', alt: '웨딩 갤러리 이미지 1' },
+  { src: '/images/gallery/2.png', alt: '웨딩 갤러리 이미지 2' },
+  { src: '/images/gallery/3.png', alt: '웨딩 갤러리 이미지 3' },
+  { src: '/images/gallery/4.png', alt: '웨딩 갤러리 이미지 4' },
+  { src: '/images/gallery/5.png', alt: '웨딩 갤러리 이미지 5' },
+  { src: '/images/gallery/6.png', alt: '웨딩 갤러리 이미지 6' },
+  { src: '/images/gallery/7.png', alt: '웨딩 갤러리 이미지 7' },
+  { src: '/images/gallery/8.png', alt: '웨딩 갤러리 이미지 8' },
+  { src: '/images/gallery/9.png', alt: '웨딩 갤러리 이미지 9' },
+  { src: '/images/gallery/10.png', alt: '웨딩 갤러리 이미지 10' },
+  { src: '/images/gallery/11.png', alt: '웨딩 갤러리 이미지 11' },
+  { src: '/images/gallery/12.png', alt: '웨딩 갤러리 이미지 12' },
+  { src: '/images/gallery/13.png', alt: '웨딩 갤러리 이미지 13' },
+  { src: '/images/gallery/14.png', alt: '웨딩 갤러리 이미지 14' },
 ];
 
 const POLAROID_ROTATIONS = [
@@ -343,7 +343,7 @@ export default function WeddingGallery({
   return (
     <>
       <section
-        className={`m-0 box-border flex w-full flex-col items-center overflow-hidden px-5 pt-14 pb-14 text-[#333333] ${GowunDodum.className}`}
+        className={`m-0 box-border flex w-full flex-col items-center overflow-hidden px-5 pt-14 pb-14 ${GowunDodum.className}`}
         aria-labelledby="wedding-gallery-title"
       >
         <WeddingSectionHeader

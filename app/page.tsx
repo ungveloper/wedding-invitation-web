@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import Cover from './Cover';
 import Greeting from './Greeting';
 import Signoff from './Signoff';
+import BackgroundMusic from './components/background-music/BackgroundMusic';
 import FadeInUp from './components/common/FadeInUp';
 import Intro from './components/intro/Intro';
 import OpeningVideo from './components/opening-video/OpeningVideo';
@@ -32,6 +33,8 @@ export default function Home(): React.ReactElement {
 
   return (
     <>
+      <BackgroundMusic variant="wedding" />
+
       <main className="mx-auto flex w-full max-w-md flex-col min-[449px]:border-x min-[449px]:border-[#e5e5e5]">
         <Intro
           variant="curtain"
@@ -72,6 +75,20 @@ export default function Home(): React.ReactElement {
             />
 
             <WeddingAccounts />
+
+            {/* 
+            <WeddingRsvp
+              groomName="웅재"
+              brideName="혜정"
+              month={9}
+              day={20}
+              dayOfWeek="일요일"
+              time="오후 12시"
+              venueName="W웨딩 국민연금웨딩홀"
+              hallName="3층 에메랄드홀"
+              formUrl="https://jealous-growth-583.notion.site/ebd//3a27f0af97c280549aaef662fc987fca"
+            />
+             */}
 
             <Signoff />
           </>

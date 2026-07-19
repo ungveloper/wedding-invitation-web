@@ -1,6 +1,6 @@
-import Image from 'next/image';
 import FadeInUp from './components/common/FadeInUp';
 import WeddingRibbon from './components/common/WeddingRibbon';
+import HeartImage from './components/heart-image/HeartImage';
 import { GowunDodum } from './lib/fonts';
 
 const greetingMessages = [
@@ -153,17 +153,7 @@ export default function Greeting(): React.ReactElement {
       </div>
        */}
 
-      <FadeInUp>
-        <div className="relative mx-auto mt-8 w-[66.6%] aspect-9/4">
-          <Image
-            src="/images/message/heart.png"
-            alt="heart"
-            fill
-            draggable={false}
-            className="pointer-events-none select-none object-cover [-webkit-user-drag:none]"
-          />
-        </div>
-      </FadeInUp>
+      <HeartImage />
     </section>
   );
 }

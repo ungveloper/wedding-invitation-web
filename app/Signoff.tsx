@@ -6,6 +6,7 @@ import type { SyntheticEvent } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { toast } from 'sonner';
 import FadeInUp from './components/common/FadeInUp';
+import HeartImage from './components/heart-image/HeartImage';
 import { GowunDodum } from './lib/fonts';
 
 const DEFAULT_KAKAO_JAVASCRIPT_KEY = '310d015109a750e6c26da3906be21d48';
@@ -99,7 +100,7 @@ export default function Signoff(): React.ReactElement {
       kakao.Share.sendDefault({
         objectType: 'feed',
         content: {
-          title: '저희 두 사람 결혼합니다',
+          title: '저희 두 사람 결혼합니다!',
           description: '소중한 분들을 저희의 시작에 초대합니다.',
           imageUrl: `${INVITATION_URL}/images/signoff/bowing.png`,
           link: {
@@ -173,17 +174,16 @@ export default function Signoff(): React.ReactElement {
             <button
               type="button"
               onClick={handleKakaoShare}
-              className="flex w-full cursor-pointer items-center gap-2 rounded-md border border-[#d8d6d2] bg-[#f1f2f6] px-5 py-4.5 text-left"
+              className="px-5 py-4.5 flex w-full justify-between items-center gap-2 rounded-md border border-[#0000000d] bg-[#F4F3F1] cursor-pointer"
             >
+              <span>카카오톡 공유하기</span>
               <Image
-                src="/images/signoff/kakaotalk.png"
+                src="/images/signoff/kakao.svg"
                 alt=""
-                width={24}
-                height={24}
+                width={16}
+                height={16}
                 aria-hidden="true"
               />
-
-              <span>카카오톡 공유하기</span>
             </button>
           </FadeInUp>
 
@@ -192,20 +192,21 @@ export default function Signoff(): React.ReactElement {
               <button
                 type="button"
                 disabled={!INVITATION_URL}
-                className="flex w-full cursor-pointer items-center gap-2 rounded-md border border-[#d8d6d2] bg-[#ededed] px-5 py-4.5 text-left disabled:cursor-not-allowed disabled:opacity-50"
+                className="px-5 py-4.5 flex w-full justify-between items-center gap-2 rounded-md border border-[#0000000d] bg-[#F4F3F1] cursor-pointer"
               >
+                <span>청첩장 링크 복사하기</span>
                 <Image
-                  src="/images/signoff/link.png"
+                  src="/images/signoff/link.svg"
                   alt=""
-                  width={24}
-                  height={24}
+                  width={16}
+                  height={16}
                   aria-hidden="true"
                 />
-
-                <span>청첩장 링크 복사하기</span>
               </button>
             </CopyToClipboard>
           </FadeInUp>
+
+          <HeartImage />
         </div>
       </section>
     </>

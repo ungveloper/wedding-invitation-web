@@ -20,7 +20,7 @@ const KOREAN_WEEKDAYS = [
 ] as const;
 
 const SECTION_BASE_CLASS = [
-  'box-border w-full bg-[#f4f3f1] px-4 pt-[46px] pb-[50px] text-[#333333]',
+  'box-border w-full bg-[#f4f3f1] px-4 pt-[46px] pb-[50px]',
 ].join(' ');
 
 const COUNTER_CLASS = [

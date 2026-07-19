@@ -22,7 +22,7 @@ export default function WeddingSectionHeader({
       <FadeInUp>
         <h2
           id={id}
-          className={`m-0 ${GowunDodum.className}text-center text-2xl leading-normal tracking-[-0.045em]`}
+          className={`m-0 ${GowunDodum.className} text-center text-2xl leading-normal tracking-[-0.045em]`}
         >
           {title}
         </h2>

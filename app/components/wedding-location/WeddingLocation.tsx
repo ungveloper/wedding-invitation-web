@@ -189,7 +189,7 @@ export default function WeddingLocation({
 
   return (
     <section
-      className={`${GowunDodum.className} flex w-full flex-col items-center bg-[#f4f3f1] px-5 pt-12 pb-14 text-[#333333]`}
+      className={`${GowunDodum.className} flex w-full flex-col items-center bg-[#f4f3f1] px-5 pt-12 pb-14`}
       aria-labelledby="wedding-location-title"
     >
       <Script
@@ -237,7 +237,7 @@ export default function WeddingLocation({
           >
             <button
               type="button"
-              className="m-0 flex h-7 w-7 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-[#777777] [-webkit-tap-highlight-color:transparent] hover:text-[#333333] focus-visible:text-[#333333] focus-visible:outline-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:fill-none [&_svg]:stroke-current [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round] [&_svg]:stroke-[1.45]"
+              className="m-0 flex h-7 w-7 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-[#777777] [-webkit-tap-highlight-color:transparent] focus-visible:outline-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:fill-none [&_svg]:stroke-current [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round] [&_svg]:stroke-[1.45]"
               aria-label="식장 주소 복사"
             >
               <Copy />
@@ -258,7 +258,7 @@ export default function WeddingLocation({
 
           {mapStatus !== 'ready' ? (
             <div
-              className="absolute inset-x-0 bottom-14 top-0 z-2 flex flex-col items-center justify-center gap-2 bg-[#f3f2f0] text-center leading-normal text-[#777777] [&_a]:font-medium [&_a]:text-[#333333] [&_a]:underline [&_a]:underline-offset-[3px]"
+              className="absolute inset-x-0 bottom-14 top-0 z-2 flex flex-col items-center justify-center gap-2 bg-[#f3f2f0] text-center leading-normal text-[#777777] [&_a]:font-medium [&_a]:underline [&_a]:underline-offset-[3px]"
               aria-live="polite"
             >
               {mapStatus === 'error' ? (

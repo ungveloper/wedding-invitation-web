@@ -1,5 +1,6 @@
 'use client';
 
+import { GowunDodum } from '@/app/lib/fonts';
 import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { toast } from 'sonner';
@@ -68,7 +69,7 @@ export default function WeddingAccounts({
 }: WeddingAccountsProps): React.ReactElement {
   return (
     <section
-      className="relative box-border flex w-full flex-col items-center px-5 py-10 text-[#333333]"
+      className="relative box-border flex w-full flex-col items-center px-5 py-10"
       aria-labelledby="wedding-accounts-title"
     >
       <WeddingSectionHeader
@@ -77,13 +78,12 @@ export default function WeddingAccounts({
         title={title}
       />
 
-      <ul className="mt-8.5 flex w-full list-none flex-col gap-2 p-0">
+      <ul className="mt-8.5 flex w-full list-none flex-col gap-4 p-0">
         <FadeInUp>
           <AccountAccordion
             id="groom-accounts"
             title="신랑측 계좌번호"
             accounts={groomAccounts}
-            defaultOpen
           />
         </FadeInUp>
         <FadeInUp>
@@ -91,7 +91,6 @@ export default function WeddingAccounts({
             id="bride-accounts"
             title="신부측 계좌번호"
             accounts={brideAccounts}
-            defaultOpen
           />
         </FadeInUp>
       </ul>
@@ -118,11 +117,11 @@ function AccountAccordion({
   const contentId = `${id}-content`;
 
   return (
-    <li className="w-full overflow-hidden">
+    <li className={`w-full overflow-hidden ${GowunDodum.className}`}>
       <button
         id={buttonId}
         type="button"
-        className="flex min-h-13.5 w-full cursor-pointer items-center justify-between bg-[#f1f0ee] px-4.25 text-left text-xl font-medium leading-normal tracking-[-0.04em] text-[#333333]"
+        className="flex min-h-13.5 w-full cursor-pointer items-center justify-between bg-[#f1f0ee] px-4.25 tracking-[-0.04em]"
         aria-expanded={isOpen}
         aria-controls={contentId}
         onClick={() => {
@@ -132,7 +131,7 @@ function AccountAccordion({
         <span>{title}</span>
 
         <svg
-          className={`size-5 shrink-0 transition-transform duration-350 ${
+          className={`size-4 shrink-0 transition-transform duration-350 ${
             isOpen ? 'rotate-180' : 'rotate-0'
           }`}
           viewBox="0 0 24 24"
@@ -172,11 +171,11 @@ function AccountAccordion({
                   className="flex w-full items-center justify-between gap-4 py-4 [&+&]:border-t [&+&]:border-[#e4e2df]"
                 >
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="block text-lg tracking-[-0.045em] text-[#333333]">
+                    <span className="block text-lg tracking-[-0.045em]">
                       {account.role}
                     </span>
 
-                    <span className="mt-1.5 block break-all text-lg leading-normal tracking-tight text-[#333333]">
+                    <span className="mt-1.5 block break-all text-lg leading-normal tracking-tight">
                       {account.accountNumber}
                     </span>
 
