@@ -14,13 +14,16 @@ import WeddingSectionHeader from '../common/WeddingSectionHeader';
 
 type KakaoLatLng = object;
 
-type KakaoZoomControlInstance = object;
-
 type KakaoMapInstance = {
   setCenter: (position: KakaoLatLng) => void;
   relayout: () => void;
-  addControl: (control: KakaoZoomControlInstance, position: unknown) => void;
-  removeControl: (control: KakaoZoomControlInstance) => void;
+  getLevel: () => number;
+  setLevel: (
+    level: number,
+    options?: {
+      animate?: boolean | number;
+    },
+  ) => void;
 };
 
 type KakaoMarkerInstance = {
@@ -35,10 +38,6 @@ type KakaoMapsNamespace = {
     options: Record<string, unknown>,
   ) => KakaoMapInstance;
   Marker: new (options: Record<string, unknown>) => KakaoMarkerInstance;
-  ZoomControl: new () => KakaoZoomControlInstance;
-  ControlPosition: {
-    RIGHT: unknown;
-  };
 };
 
 declare global {
@@ -73,6 +72,7 @@ export default function WeddingLocation({
   kakaoMapJavaScriptKey = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY ?? '',
 }: WeddingLocationProps): React.ReactElement {
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<KakaoMapInstance | null>(null);
 
   const [mapStatus, setMapStatus] = useState<MapStatus>(
     kakaoMapJavaScriptKey ? 'loading' : 'error',
@@ -91,6 +91,34 @@ export default function WeddingLocation({
     });
   };
 
+  const handleZoomIn = (): void => {
+    const map = mapInstanceRef.current;
+
+    if (!map) {
+      return;
+    }
+
+    const nextLevel = Math.max(1, map.getLevel() - 1);
+
+    map.setLevel(nextLevel, {
+      animate: 200,
+    });
+  };
+
+  const handleZoomOut = (): void => {
+    const map = mapInstanceRef.current;
+
+    if (!map) {
+      return;
+    }
+
+    const nextLevel = Math.min(14, map.getLevel() + 1);
+
+    map.setLevel(nextLevel, {
+      animate: 200,
+    });
+  };
+
   useEffect(() => {
     if (mapStatus !== 'ready' || !mapContainerRef.current) {
       return;
@@ -104,10 +132,9 @@ export default function WeddingLocation({
     }
 
     const center = new maps.LatLng(latitude, longitude);
-
     const map = new maps.Map(mapContainerRef.current, {
       center,
-      level: 4,
+      level: 3,
       draggable: false,
       scrollwheel: false,
       disableDoubleClick: true,
@@ -115,15 +142,13 @@ export default function WeddingLocation({
       keyboardShortcuts: false,
     });
 
+    mapInstanceRef.current = map;
+
     const marker = new maps.Marker({
       position: center,
       map,
       title: venueName,
     });
-
-    const zoomControl = new maps.ZoomControl();
-
-    map.addControl(zoomControl, maps.ControlPosition.RIGHT);
 
     const resizeMap = (): void => {
       map.relayout();
@@ -141,16 +166,16 @@ export default function WeddingLocation({
     return () => {
       resizeObserver?.disconnect();
       window.removeEventListener('resize', resizeMap);
-      map.removeControl(zoomControl);
       marker.setMap(null);
+
+      if (mapInstanceRef.current === map) {
+        mapInstanceRef.current = null;
+      }
     };
   }, [latitude, longitude, mapStatus, venueName]);
 
   const encodedVenueName = encodeURIComponent(venueName);
-
-  const kakaoMapUrl =
-    `https://map.kakao.com/link/map/` +
-    `${encodedVenueName},${latitude},${longitude}`;
+  const kakaoMapUrl = `https://map.kakao.com/link/map/${encodedVenueName},${latitude},${longitude}`;
 
   return (
     <section
@@ -182,7 +207,6 @@ export default function WeddingLocation({
           <p className="m-0 text-lg leading-[1.65] tracking-[-0.04em]">
             {venueName}
           </p>
-
           <p className="m-0 text-lg leading-[1.65] tracking-[-0.04em]">
             {hallName}
           </p>
@@ -194,7 +218,6 @@ export default function WeddingLocation({
           <p className="m-0 text-lg font-normal leading-[1.65] tracking-[-0.04em]">
             {address}
           </p>
-
           <CopyToClipboard
             text={address}
             onCopy={(_, copied) => {
@@ -208,7 +231,7 @@ export default function WeddingLocation({
           >
             <button
               type="button"
-              className="m-0 flex h-7 w-7 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-[#777777] [-webkit-tap-highlight-color:transparent] focus-visible:outline-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:fill-none [&_svg]:stroke-current [&_svg]:stroke-[1.45] [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round]"
+              className="m-0 flex h-7 w-7 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-[#777777] [-webkit-tap-highlight-color:transparent] focus-visible:outline-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:fill-none [&_svg]:stroke-current [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round] [&_svg]:stroke-[1.45]"
               aria-label="식장 주소 복사"
             >
               <Copy />
@@ -220,39 +243,66 @@ export default function WeddingLocation({
       <FadeInUp>
         <div className="relative mt-7 w-full overflow-hidden">
           <FadeInUp>
-            <div
-              ref={mapContainerRef}
-              className="relative aspect-366/294 w-full touch-pan-y overflow-clip rounded-md border border-gray-200 bg-[#ecebea]"
-              aria-label={`${venueName} 카카오맵`}
-            />
-          </FadeInUp>
+            <div className="relative aspect-366/294 w-full overflow-hidden rounded-md border border-gray-200 bg-[#ecebea]">
+              <div
+                ref={mapContainerRef}
+                className="pointer-events-none absolute inset-0 touch-pan-y"
+                aria-label={`${venueName} 카카오맵`}
+              />
 
-          {mapStatus !== 'ready' ? (
-            <div
-              className="absolute inset-x-0 top-0 bottom-14 z-2 flex flex-col items-center justify-center gap-2 bg-[#f3f2f0] text-center leading-normal text-[#777777] [&_a]:font-medium [&_a]:underline [&_a]:underline-offset-[3px]"
-              aria-live="polite"
-            >
-              {mapStatus === 'error' ? (
-                <>
-                  <span>지도를 불러오지 못했습니다.</span>
+              {mapStatus === 'ready' ? (
+                <div
+                  className="pointer-events-auto absolute top-1/2 right-2 z-10 flex -translate-y-1/2 flex-col overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm"
+                  role="group"
+                  aria-label="지도 확대 및 축소"
+                >
+                  <button
+                    type="button"
+                    className="flex h-9 w-9 touch-manipulation items-center justify-center border-0 border-b border-gray-200 bg-white p-0 text-xl leading-none text-gray-700 [-webkit-tap-highlight-color:transparent] active:bg-gray-100"
+                    onClick={handleZoomIn}
+                    aria-label="지도 확대"
+                  >
+                    <span aria-hidden="true">+</span>
+                  </button>
 
-                  <a href={kakaoMapUrl} target="_blank" rel="noreferrer">
-                    카카오맵에서 보기
-                  </a>
-                </>
-              ) : (
-                <span>지도를 불러오는 중입니다.</span>
-              )}
+                  <button
+                    type="button"
+                    className="flex h-9 w-9 touch-manipulation items-center justify-center border-0 bg-white p-0 text-xl leading-none text-gray-700 [-webkit-tap-highlight-color:transparent] active:bg-gray-100"
+                    onClick={handleZoomOut}
+                    aria-label="지도 축소"
+                  >
+                    <span aria-hidden="true">−</span>
+                  </button>
+                </div>
+              ) : null}
+
+              {mapStatus !== 'ready' ? (
+                <div
+                  className="pointer-events-none absolute inset-0 z-2 flex flex-col items-center justify-center gap-2 bg-[#f3f2f0] text-center leading-normal text-[#777777] [&_a]:pointer-events-auto [&_a]:font-medium [&_a]:underline [&_a]:underline-offset-[3px]"
+                  aria-live="polite"
+                >
+                  {mapStatus === 'error' ? (
+                    <>
+                      <span>지도를 불러오지 못했습니다.</span>
+                      <a href={kakaoMapUrl} target="_blank" rel="noreferrer">
+                        카카오맵에서 보기
+                      </a>
+                    </>
+                  ) : (
+                    <span>지도를 불러오는 중입니다.</span>
+                  )}
+                </div>
+              ) : null}
             </div>
-          ) : null}
+          </FadeInUp>
 
           <div className={`grid grid-cols-2 gap-0 ${GowunDodum.className}`}>
             {mapLinks.map((mapLink) => (
               <Link
                 key={mapLink.id}
-                href={mapLink.href}
                 target="_blank"
                 rel="noreferrer"
+                href={mapLink.href}
                 className="flex items-center gap-1 overflow-clip rounded-md border border-gray-200 bg-gray-50"
               >
                 <div className="flex w-full items-center justify-between px-4 py-3">

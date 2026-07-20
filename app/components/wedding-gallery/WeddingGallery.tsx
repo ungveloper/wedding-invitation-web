@@ -79,6 +79,23 @@ export default function WeddingGallery({
   const [isLightboxVisible, setIsLightboxVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
+  const [loadedImageSources, setLoadedImageSources] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  const markImageAsLoaded = useCallback((src: string): void => {
+    setLoadedImageSources((currentSources) => {
+      if (currentSources.has(src)) {
+        return currentSources;
+      }
+
+      const nextSources = new Set(currentSources);
+
+      nextSources.add(src);
+
+      return nextSources;
+    });
+  }, []);
 
   const isLightboxOpen = selectedIndex !== null;
   const portalRoot = typeof document === 'undefined' ? null : document.body;
@@ -286,9 +303,22 @@ export default function WeddingGallery({
                   onContextMenu={(event) => event.preventDefault()}
                   onDoubleClick={(event) => event.preventDefault()}
                 >
+                  {!loadedImageSources.has(selectedImage.src) ? (
+                    <span
+                      className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+                      aria-hidden="true"
+                    >
+                      <span className="h-8 w-8 animate-spin rounded-full border-2 border-[#c9c7c3] border-t-[#777777]" />
+                    </span>
+                  ) : null}
+
                   <Image
                     key={selectedImage.src}
-                    className="pointer-events-none object-cover object-center select-none [-webkit-user-drag:none] [-webkit-touch-callout:none]"
+                    className={`pointer-events-none z-[1] object-cover object-center select-none transition-opacity duration-300 [-webkit-user-drag:none] [-webkit-touch-callout:none] ${
+                      loadedImageSources.has(selectedImage.src)
+                        ? 'opacity-100'
+                        : 'opacity-0'
+                    }`}
                     src={selectedImage.src}
                     alt={selectedImage.alt}
                     fill
@@ -296,6 +326,12 @@ export default function WeddingGallery({
                     loading="eager"
                     unoptimized
                     draggable={false}
+                    onLoad={() => {
+                      markImageAsLoaded(selectedImage.src);
+                    }}
+                    onError={() => {
+                      markImageAsLoaded(selectedImage.src);
+                    }}
                   />
 
                   <span
@@ -366,14 +402,33 @@ export default function WeddingGallery({
                   >
                     <span className="box-border block w-full bg-white px-2 pt-2 pb-0 shadow-[0_2px_7px_rgb(0_0_0/10%),0_1px_2px_rgb(0_0_0/7%)]">
                       <span className="relative block aspect-3/4 w-full touch-pan-y overflow-hidden bg-[#e9e8e6] select-none [-webkit-touch-callout:none]">
+                        {!loadedImageSources.has(image.src) ? (
+                          <span
+                            className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+                            aria-hidden="true"
+                          >
+                            <span className="h-6 w-6 animate-spin rounded-full border-2 border-[#c9c7c3] border-t-[#777777]" />
+                          </span>
+                        ) : null}
+
                         <Image
-                          className="pointer-events-none object-cover object-center select-none [-webkit-user-drag:none] [-webkit-touch-callout:none]"
+                          className={`pointer-events-none z-[1] object-cover object-center select-none transition-opacity duration-300 [-webkit-user-drag:none] [-webkit-touch-callout:none] ${
+                            loadedImageSources.has(image.src)
+                              ? 'opacity-100'
+                              : 'opacity-0'
+                          }`}
                           src={image.src}
                           alt={image.alt}
                           fill
                           sizes="(max-width: 448px) 42vw, 176px"
                           loading="lazy"
                           draggable={false}
+                          onLoad={() => {
+                            markImageAsLoaded(image.src);
+                          }}
+                          onError={() => {
+                            markImageAsLoaded(image.src);
+                          }}
                         />
 
                         <span
