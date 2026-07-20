@@ -14,9 +14,13 @@ import WeddingSectionHeader from '../common/WeddingSectionHeader';
 
 type KakaoLatLng = object;
 
+type KakaoZoomControlInstance = object;
+
 type KakaoMapInstance = {
   setCenter: (position: KakaoLatLng) => void;
   relayout: () => void;
+  addControl: (control: KakaoZoomControlInstance, position: unknown) => void;
+  removeControl: (control: KakaoZoomControlInstance) => void;
 };
 
 type KakaoMarkerInstance = {
@@ -31,6 +35,10 @@ type KakaoMapsNamespace = {
     options: Record<string, unknown>,
   ) => KakaoMapInstance;
   Marker: new (options: Record<string, unknown>) => KakaoMarkerInstance;
+  ZoomControl: new () => KakaoZoomControlInstance;
+  ControlPosition: {
+    RIGHT: unknown;
+  };
 };
 
 declare global {
@@ -113,6 +121,10 @@ export default function WeddingLocation({
       title: venueName,
     });
 
+    const zoomControl = new maps.ZoomControl();
+
+    map.addControl(zoomControl, maps.ControlPosition.RIGHT);
+
     const resizeMap = (): void => {
       map.relayout();
       map.setCenter(center);
@@ -129,6 +141,7 @@ export default function WeddingLocation({
     return () => {
       resizeObserver?.disconnect();
       window.removeEventListener('resize', resizeMap);
+      map.removeControl(zoomControl);
       marker.setMap(null);
     };
   }, [latitude, longitude, mapStatus, venueName]);
@@ -209,7 +222,7 @@ export default function WeddingLocation({
           <FadeInUp>
             <div
               ref={mapContainerRef}
-              className="pointer-events-none relative aspect-366/294 w-full touch-pan-y overflow-clip rounded-md border border-gray-200 bg-[#ecebea]"
+              className="relative aspect-366/294 w-full touch-pan-y overflow-clip rounded-md border border-gray-200 bg-[#ecebea]"
               aria-label={`${venueName} 카카오맵`}
             />
           </FadeInUp>
