@@ -314,7 +314,7 @@ export default function WeddingGallery({
 
                   <Image
                     key={selectedImage.src}
-                    className={`pointer-events-none z-[1] object-cover object-center select-none transition-opacity duration-300 [-webkit-user-drag:none] [-webkit-touch-callout:none] ${
+                    className={`pointer-events-none z-1 object-cover object-center select-none transition-opacity duration-300 [-webkit-user-drag:none] [-webkit-touch-callout:none] ${
                       loadedImageSources.has(selectedImage.src)
                         ? 'opacity-100'
                         : 'opacity-0'
@@ -412,7 +412,7 @@ export default function WeddingGallery({
                         ) : null}
 
                         <Image
-                          className={`pointer-events-none z-[1] object-cover object-center select-none transition-opacity duration-300 [-webkit-user-drag:none] [-webkit-touch-callout:none] ${
+                          className={`pointer-events-none z-1 object-cover object-center select-none transition-opacity duration-300 [-webkit-user-drag:none] [-webkit-touch-callout:none] ${
                             loadedImageSources.has(image.src)
                               ? 'opacity-100'
                               : 'opacity-0'

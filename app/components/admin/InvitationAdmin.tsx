@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import type { VisitDetail } from '@/app/types/analytics';
 import type {
   DashboardData,
   GuestbookEntry,
@@ -209,14 +210,56 @@ export default function InvitationAdmin({
         </header>
 
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="오늘 방문자" value={dashboard.stats.todayVisitors} />
-          <StatCard label="총 방문자" value={dashboard.stats.totalVisitors} />
+          <StatCard
+            label={`/${dashboard.invitation.slug} 오늘 방문자`}
+            value={dashboard.stats.todayVisitors}
+          />
+          <StatCard
+            label={`/${dashboard.invitation.slug} 누적 방문자`}
+            value={dashboard.stats.totalVisitors}
+          />
           <StatCard label="RSVP 응답" value={attendanceSummary.responses} />
           <StatCard
             label="참석 예정 인원"
             value={attendanceSummary.attendingPeople}
           />
         </section>
+
+        {dashboard.siteStats ? (
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div>
+              <p className="text-sm font-medium text-rose-600">서비스 전체 통계</p>
+              <h2 className="mt-1 text-lg font-bold">mocheong.com 홈페이지 방문자</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                루트 주소에 직접 접속한 고유 방문자만 집계합니다.
+              </p>
+            </div>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <StatCard
+                label="홈페이지 오늘 방문자"
+                value={dashboard.siteStats.todayVisitors}
+              />
+              <StatCard
+                label="홈페이지 누적 방문자"
+                value={dashboard.siteStats.totalVisitors}
+              />
+            </div>
+          </section>
+        ) : null}
+
+        <VisitTable
+          title={`/${dashboard.invitation.slug} 최근 유입 정보`}
+          description="같은 브라우저의 새로고침은 다시 집계하지 않고, 하루에 한 번만 기록합니다."
+          visits={dashboard.recentVisits}
+        />
+
+        {dashboard.siteStats ? (
+          <VisitTable
+            title="mocheong.com 홈페이지 최근 유입 정보"
+            description="루트 주소에 직접 들어온 방문자의 최초 일일 유입 정보를 표시합니다."
+            visits={dashboard.siteRecentVisits}
+          />
+        ) : null}
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col gap-1">
@@ -415,6 +458,96 @@ export default function InvitationAdmin({
         </section>
       </div>
     </main>
+  );
+}
+
+function VisitTable({
+  title,
+  description,
+  visits,
+}: {
+  title: string;
+  description: string;
+  visits: VisitDetail[];
+}) {
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 className="text-lg font-bold">{title}</h2>
+      <p className="mt-1 text-sm text-slate-500">{description}</p>
+      <div className="mt-5 overflow-x-auto">
+        <table className="min-w-full border-collapse text-left text-xs">
+          <thead>
+            <tr className="border-b border-slate-200 text-slate-500">
+              <th className="whitespace-nowrap px-3 py-3 font-medium">방문 시각</th>
+              <th className="whitespace-nowrap px-3 py-3 font-medium">경로</th>
+              <th className="whitespace-nowrap px-3 py-3 font-medium">유입 경로</th>
+              <th className="whitespace-nowrap px-3 py-3 font-medium">IP</th>
+              <th className="whitespace-nowrap px-3 py-3 font-medium">지역</th>
+              <th className="whitespace-nowrap px-3 py-3 font-medium">환경</th>
+              <th className="whitespace-nowrap px-3 py-3 font-medium">캠페인</th>
+              <th className="whitespace-nowrap px-3 py-3 font-medium">방문자 키</th>
+            </tr>
+          </thead>
+          <tbody>
+            {visits.length === 0 ? (
+              <tr>
+                <td className="px-3 py-8 text-center text-slate-500" colSpan={8}>
+                  아직 수집된 방문 정보가 없습니다.
+                </td>
+              </tr>
+            ) : (
+              visits.map((visit) => (
+                <tr key={visit.id} className="border-b border-slate-100 align-top">
+                  <td className="whitespace-nowrap px-3 py-3 text-slate-500">
+                    {formatDate(visit.visitedAt)}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">
+                    {visit.pagePath || '-'}
+                    {visit.templateId ? ` · ${visit.templateId}번` : ''}
+                  </td>
+                  <td className="max-w-64 px-3 py-3">
+                    <span className="block font-medium">
+                      {visit.referrerHost || '직접 유입'}
+                    </span>
+                    {visit.referrer ? (
+                      <span className="mt-1 block truncate text-slate-400" title={visit.referrer}>
+                        {visit.referrer}
+                      </span>
+                    ) : null}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3 font-mono">
+                    {visit.ipAddress || visit.ipMasked || '-'}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">
+                    {[visit.country, visit.region, visit.city]
+                      .filter(Boolean)
+                      .join(' / ') || '-'}
+                  </td>
+                  <td className="max-w-72 px-3 py-3">
+                    <span className="block">
+                      {[visit.platform, visit.language].filter(Boolean).join(' / ') || '-'}
+                    </span>
+                    {visit.userAgent ? (
+                      <span className="mt-1 block truncate text-slate-400" title={visit.userAgent}>
+                        {visit.userAgent}
+                      </span>
+                    ) : null}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">
+                    {[visit.utmSource, visit.utmMedium, visit.utmCampaign]
+                      .filter(Boolean)
+                      .join(' / ') || '-'}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3 font-mono text-slate-400">
+                    {visit.visitorHash || '-'}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
 

@@ -19,7 +19,11 @@ export default function InvitationRenderer({
   switch (templateId) {
     case 1:
       return (
-        <TemplateOne invitation={invitation} invitationUrl={invitationUrl} />
+        <TemplateOne
+          invitation={invitation}
+          invitationUrl={invitationUrl}
+          templateId={templateId}
+        />
       );
     default:
       return null;

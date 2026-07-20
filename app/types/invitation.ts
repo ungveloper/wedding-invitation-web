@@ -1,3 +1,5 @@
+import type { VisitDetail } from './analytics';
+
 export type RootAccessMode =
   | 'redirect-random'
   | 'render-random'
@@ -189,6 +191,9 @@ export type DashboardData = {
   invitation: InvitationData;
   templates: TemplateDefinition[];
   stats: InvitationStats;
+  recentVisits: VisitDetail[];
+  siteStats: InvitationStats | null;
+  siteRecentVisits: VisitDetail[];
   rsvps: RsvpEntry[];
   guestbook: GuestbookEntry[];
 };

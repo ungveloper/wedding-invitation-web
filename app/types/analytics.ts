@@ -1,0 +1,64 @@
+export type VisitClientData = {
+  pagePath: string;
+  pageUrl: string;
+  referrer: string;
+  templateId: number | null;
+  language: string;
+  clientTimezone: string;
+  screenWidth: number | null;
+  screenHeight: number | null;
+  viewportWidth: number | null;
+  viewportHeight: number | null;
+  devicePixelRatio: number | null;
+  colorDepth: number | null;
+  hardwareConcurrency: number | null;
+  deviceMemory: number | null;
+  connectionType: string;
+  platform: string;
+};
+
+export type VisitRequestData = VisitClientData & {
+  ipAddress: string;
+  ipMasked: string;
+  ipHash: string;
+  userAgent: string;
+  serverReferrer: string;
+  referrerHost: string;
+  host: string;
+  continent: string;
+  country: string;
+  region: string;
+  city: string;
+  latitude: string;
+  longitude: string;
+  timezone: string;
+  postalCode: string;
+  utmSource: string;
+  utmMedium: string;
+  utmCampaign: string;
+  utmTerm: string;
+  utmContent: string;
+};
+
+export type VisitDetail = {
+  id: string;
+  dateKey: string;
+  visitorHash: string;
+  visitedAt: string;
+  pagePath: string;
+  templateId: number | null;
+  referrer: string;
+  referrerHost: string;
+  ipAddress: string;
+  ipMasked: string;
+  country: string;
+  region: string;
+  city: string;
+  timezone: string;
+  userAgent: string;
+  language: string;
+  platform: string;
+  utmSource: string;
+  utmMedium: string;
+  utmCampaign: string;
+};

@@ -20,11 +20,13 @@ import type { InvitationData } from '@/app/types/invitation';
 type TemplateOneProps = {
   invitation: InvitationData;
   invitationUrl: string;
+  templateId: number;
 };
 
 export default function TemplateOne({
   invitation,
   invitationUrl,
+  templateId,
 }: TemplateOneProps): React.ReactElement {
   const [shouldPlayOpeningVideo, setShouldPlayOpeningVideo] = useState(false);
   const [isOpeningVideoActive, setIsOpeningVideoActive] = useState(false);
@@ -46,7 +48,7 @@ export default function TemplateOne({
 
   return (
     <>
-      <VisitorTracker invitationId={invitation.slug} />
+      <VisitorTracker invitationId={invitation.slug} templateId={templateId} />
 
       <BackgroundMusic
         variant={content.backgroundMusic.variant}

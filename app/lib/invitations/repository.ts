@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+import type { VisitDetail, VisitRequestData } from '@/app/types/analytics';
 import type {
   DashboardData,
   GuestbookEntry,
@@ -462,43 +463,95 @@ export async function updateInvitationSettings(
     });
 }
 
-export async function recordInvitationVisit(
-  invitationId: string,
+type AnalyticsScopeRefs = {
+  summaryRef: FirebaseFirestore.DocumentReference;
+  dailyRef: FirebaseFirestore.DocumentReference;
+  allTimeMarkerRef: FirebaseFirestore.DocumentReference;
+  dailyMarkerRef: FirebaseFirestore.DocumentReference;
+};
+
+function createVisitMarkerData(
+  visitorHash: string,
+  dateKey: string,
+  visit: VisitRequestData,
+): Record<string, unknown> {
+  return {
+    kind: 'daily',
+    visitorHash,
+    dateKey,
+    pagePath: visit.pagePath,
+    pageUrl: visit.pageUrl,
+    templateId: visit.templateId,
+    referrer: visit.referrer || visit.serverReferrer,
+    referrerHost: visit.referrerHost,
+    serverReferrer: visit.serverReferrer,
+    ipAddress: visit.ipAddress,
+    ipMasked: visit.ipMasked,
+    ipHash: visit.ipHash,
+    userAgent: visit.userAgent,
+    host: visit.host,
+    continent: visit.continent,
+    country: visit.country,
+    region: visit.region,
+    city: visit.city,
+    latitude: visit.latitude,
+    longitude: visit.longitude,
+    timezone: visit.timezone,
+    postalCode: visit.postalCode,
+    language: visit.language,
+    clientTimezone: visit.clientTimezone,
+    screenWidth: visit.screenWidth,
+    screenHeight: visit.screenHeight,
+    viewportWidth: visit.viewportWidth,
+    viewportHeight: visit.viewportHeight,
+    devicePixelRatio: visit.devicePixelRatio,
+    colorDepth: visit.colorDepth,
+    hardwareConcurrency: visit.hardwareConcurrency,
+    deviceMemory: visit.deviceMemory,
+    connectionType: visit.connectionType,
+    platform: visit.platform,
+    utmSource: visit.utmSource,
+    utmMedium: visit.utmMedium,
+    utmCampaign: visit.utmCampaign,
+    utmTerm: visit.utmTerm,
+    utmContent: visit.utmContent,
+    visitedAt: FieldValue.serverTimestamp(),
+  };
+}
+
+async function recordUniqueVisit(
   visitorId: string,
+  visit: VisitRequestData,
+  refs: AnalyticsScopeRefs,
 ): Promise<void> {
   const normalizedVisitorId = asNonEmptyString(visitorId, '방문자 ID', 200);
-  const invitation = await getInvitation(invitationId);
-
-  if (!invitation || invitation.status === 'archived') {
-    throw new Error('NOT_FOUND');
-  }
-
-  const db = getAdminFirestore();
-  const invitationRef = db.collection('invitations').doc(invitation.slug);
   const visitorHash = hashVisitorId(normalizedVisitorId);
   const dateKey = getKoreaDateKey();
-  const allTimeMarkerRef = invitationRef
-    .collection('visitorKeys')
-    .doc(`all_${visitorHash}`);
-  const dailyMarkerRef = invitationRef
-    .collection('visitorKeys')
-    .doc(`day_${dateKey}_${visitorHash}`);
-  const summaryRef = invitationRef.collection('analytics').doc('summary');
-  const dailyRef = invitationRef.collection('analytics').doc(dateKey);
+  const db = getAdminFirestore();
 
   await db.runTransaction(async (transaction) => {
     const [allTimeMarker, dailyMarker] = await transaction.getAll(
-      allTimeMarkerRef,
-      dailyMarkerRef,
+      refs.allTimeMarkerRef,
+      refs.dailyMarkerRef,
     );
 
     if (!allTimeMarker.exists) {
-      transaction.create(allTimeMarkerRef, {
+      transaction.create(refs.allTimeMarkerRef, {
+        kind: 'all-time',
         visitorHash,
+        firstDateKey: dateKey,
+        firstPagePath: visit.pagePath,
+        firstReferrer: visit.referrer || visit.serverReferrer,
+        firstReferrerHost: visit.referrerHost,
+        firstIpHash: visit.ipHash,
+        firstIpMasked: visit.ipMasked,
+        firstCountry: visit.country,
+        firstRegion: visit.region,
+        firstCity: visit.city,
         firstVisitedAt: FieldValue.serverTimestamp(),
       });
       transaction.set(
-        summaryRef,
+        refs.summaryRef,
         {
           totalVisitors: FieldValue.increment(1),
           updatedAt: FieldValue.serverTimestamp(),
@@ -508,13 +561,12 @@ export async function recordInvitationVisit(
     }
 
     if (!dailyMarker.exists) {
-      transaction.create(dailyMarkerRef, {
-        visitorHash,
-        dateKey,
-        visitedAt: FieldValue.serverTimestamp(),
-      });
+      transaction.create(
+        refs.dailyMarkerRef,
+        createVisitMarkerData(visitorHash, dateKey, visit),
+      );
       transaction.set(
-        dailyRef,
+        refs.dailyRef,
         {
           visitors: FieldValue.increment(1),
           dateKey,
@@ -523,6 +575,55 @@ export async function recordInvitationVisit(
         { merge: true },
       );
     }
+  });
+}
+
+export async function recordInvitationVisit(
+  invitationId: string,
+  visitorId: string,
+  visit: VisitRequestData,
+): Promise<void> {
+  const invitation = await getInvitation(invitationId);
+
+  if (!invitation || invitation.status === 'archived') {
+    throw new Error('NOT_FOUND');
+  }
+
+  const invitationRef = getAdminFirestore()
+    .collection('invitations')
+    .doc(invitation.slug);
+  const visitorHash = hashVisitorId(visitorId);
+  const dateKey = getKoreaDateKey();
+
+  await recordUniqueVisit(visitorId, visit, {
+    summaryRef: invitationRef.collection('analytics').doc('summary'),
+    dailyRef: invitationRef.collection('analytics').doc(dateKey),
+    allTimeMarkerRef: invitationRef
+      .collection('visitorKeys')
+      .doc(`all_${visitorHash}`),
+    dailyMarkerRef: invitationRef
+      .collection('visitorKeys')
+      .doc(`day_${dateKey}_${visitorHash}`),
+  });
+}
+
+export async function recordSiteVisit(
+  visitorId: string,
+  visit: VisitRequestData,
+): Promise<void> {
+  const siteRef = getAdminFirestore().collection('analytics').doc('site');
+  const visitorHash = hashVisitorId(visitorId);
+  const dateKey = getKoreaDateKey();
+
+  await recordUniqueVisit(visitorId, visit, {
+    summaryRef: siteRef,
+    dailyRef: siteRef.collection('daily').doc(dateKey),
+    allTimeMarkerRef: siteRef
+      .collection('visitorKeys')
+      .doc(`all_${visitorHash}`),
+    dailyMarkerRef: siteRef
+      .collection('visitorKeys')
+      .doc(`day_${dateKey}_${visitorHash}`),
   });
 }
 
@@ -693,22 +794,109 @@ async function getInvitationStats(invitationId: string): Promise<InvitationStats
   };
 }
 
+async function getSiteStats(): Promise<InvitationStats> {
+  const siteRef = getAdminFirestore().collection('analytics').doc('site');
+  const dateKey = getKoreaDateKey();
+  const [summary, daily] = await Promise.all([
+    siteRef.get(),
+    siteRef.collection('daily').doc(dateKey).get(),
+  ]);
+
+  return {
+    todayVisitors: Number(daily.data()?.visitors ?? 0),
+    totalVisitors: Number(summary.data()?.totalVisitors ?? 0),
+  };
+}
+
+function toVisitDetail(
+  document: FirebaseFirestore.QueryDocumentSnapshot,
+): VisitDetail {
+  const data = document.data();
+
+  return {
+    id: document.id,
+    dateKey: String(data.dateKey ?? ''),
+    visitorHash: String(data.visitorHash ?? '').slice(0, 12),
+    visitedAt: toIsoString(data.visitedAt),
+    pagePath: String(data.pagePath ?? ''),
+    templateId:
+      Number.isInteger(data.templateId) && Number(data.templateId) > 0
+        ? Number(data.templateId)
+        : null,
+    referrer: String(data.referrer ?? ''),
+    referrerHost: String(data.referrerHost ?? ''),
+    ipAddress: String(data.ipAddress ?? ''),
+    ipMasked: String(data.ipMasked ?? ''),
+    country: String(data.country ?? ''),
+    region: String(data.region ?? ''),
+    city: String(data.city ?? ''),
+    timezone: String(data.timezone ?? ''),
+    userAgent: String(data.userAgent ?? ''),
+    language: String(data.language ?? ''),
+    platform: String(data.platform ?? ''),
+    utmSource: String(data.utmSource ?? ''),
+    utmMedium: String(data.utmMedium ?? ''),
+    utmCampaign: String(data.utmCampaign ?? ''),
+  };
+}
+
+async function listRecentVisits(
+  visitorKeys: FirebaseFirestore.CollectionReference,
+  limit = 50,
+): Promise<VisitDetail[]> {
+  const snapshot = await visitorKeys
+    .orderBy('visitedAt', 'desc')
+    .limit(limit)
+    .get();
+
+  return snapshot.docs.map(toVisitDetail);
+}
+
+function isServiceAdmin(email: string): boolean {
+  const configuredEmails = (
+    process.env.MOCHENG_ADMIN_EMAILS ?? '93y0916@gmail.com'
+  )
+    .split(',')
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+
+  return configuredEmails.includes(email.trim().toLowerCase());
+}
+
 export async function getDashboardData(
   invitationId: string,
   ownerEmail: string,
 ): Promise<DashboardData | null> {
   const invitation = await getInvitation(invitationId);
 
-  if (!invitation || invitation.ownerEmail.toLowerCase() !== ownerEmail.toLowerCase()) {
+  if (
+    !invitation ||
+    invitation.ownerEmail.toLowerCase() !== ownerEmail.toLowerCase()
+  ) {
     return null;
   }
 
   const invitationRef = getAdminFirestore()
     .collection('invitations')
     .doc(invitation.slug);
-  const [templates, stats, rsvpSnapshot, guestbookSnapshot] = await Promise.all([
+  const serviceAdmin = isServiceAdmin(ownerEmail);
+  const siteRef = getAdminFirestore().collection('analytics').doc('site');
+  const [
+    templates,
+    stats,
+    recentVisits,
+    siteStats,
+    siteRecentVisits,
+    rsvpSnapshot,
+    guestbookSnapshot,
+  ] = await Promise.all([
     listTemplates(),
     getInvitationStats(invitation.slug),
+    listRecentVisits(invitationRef.collection('visitorKeys')),
+    serviceAdmin ? getSiteStats() : Promise.resolve(null),
+    serviceAdmin
+      ? listRecentVisits(siteRef.collection('visitorKeys'))
+      : Promise.resolve([]),
     invitationRef
       .collection('rsvps')
       .orderBy('createdAt', 'desc')
@@ -757,7 +945,11 @@ export async function getDashboardData(
     invitation,
     templates,
     stats,
+    recentVisits,
+    siteStats,
+    siteRecentVisits,
     rsvps,
     guestbook,
   };
 }
+
