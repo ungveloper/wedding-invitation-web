@@ -40,6 +40,7 @@ const SWIPE_THRESHOLD = 48;
 const POLAROID_ITEM_CLASS_NAME = [
   'relative block m-0 w-full min-w-0 border-0 p-0',
   'cursor-pointer bg-transparent text-inherit',
+  'touch-pan-y select-none [-webkit-touch-callout:none]',
   'origin-center',
   '[transform:rotate(var(--polaroid-rotation))]',
   'transition-[transform,filter] duration-300 ease-out',
@@ -82,10 +83,7 @@ export default function WeddingGallery({
   const isLightboxOpen = selectedIndex !== null;
   const portalRoot = typeof document === 'undefined' ? null : document.body;
 
-  const galleryImages = useMemo(
-    () => [...images],
-    [images],
-  );
+  const galleryImages = useMemo(() => [...images], [images]);
 
   const visibleGalleryImages = galleryImages.slice(0, visibleCount);
   const hasMoreImages = visibleCount < galleryImages.length;
@@ -283,10 +281,14 @@ export default function WeddingGallery({
               ) : null}
 
               <div className="w-full -rotate-1 bg-white px-2.5 pt-2.5 pb-0 shadow-[0_18px_48px_rgb(0_0_0/34%)]">
-                <div className="relative aspect-3/4 w-full overflow-hidden bg-[#e9e8e6]">
+                <div
+                  className="relative aspect-3/4 w-full touch-none overflow-hidden bg-[#e9e8e6] select-none [-webkit-touch-callout:none]"
+                  onContextMenu={(event) => event.preventDefault()}
+                  onDoubleClick={(event) => event.preventDefault()}
+                >
                   <Image
                     key={selectedImage.src}
-                    className="pointer-events-none object-cover object-center select-none [-webkit-user-drag:none]"
+                    className="pointer-events-none object-cover object-center select-none [-webkit-user-drag:none] [-webkit-touch-callout:none]"
                     src={selectedImage.src}
                     alt={selectedImage.alt}
                     fill
@@ -294,6 +296,13 @@ export default function WeddingGallery({
                     loading="eager"
                     unoptimized
                     draggable={false}
+                  />
+
+                  <span
+                    className="absolute inset-0 z-10 block touch-none select-none bg-transparent [-webkit-touch-callout:none]"
+                    aria-hidden="true"
+                    onContextMenu={(event) => event.preventDefault()}
+                    onDragStart={(event) => event.preventDefault()}
                   />
                 </div>
 
@@ -351,18 +360,27 @@ export default function WeddingGallery({
                     style={itemStyle}
                     type="button"
                     onClick={() => openLightbox(index)}
+                    onContextMenu={(event) => event.preventDefault()}
+                    onDoubleClick={(event) => event.preventDefault()}
                     aria-label={`${image.alt} 크게 보기`}
                   >
                     <span className="box-border block w-full bg-white px-2 pt-2 pb-0 shadow-[0_2px_7px_rgb(0_0_0/10%),0_1px_2px_rgb(0_0_0/7%)]">
-                      <span className="relative block aspect-3/4 w-full overflow-hidden bg-[#e9e8e6]">
+                      <span className="relative block aspect-3/4 w-full touch-pan-y overflow-hidden bg-[#e9e8e6] select-none [-webkit-touch-callout:none]">
                         <Image
-                          className="object-cover object-center select-none [-webkit-user-drag:none]"
+                          className="pointer-events-none object-cover object-center select-none [-webkit-user-drag:none] [-webkit-touch-callout:none]"
                           src={image.src}
                           alt={image.alt}
                           fill
                           sizes="(max-width: 448px) 42vw, 176px"
                           loading="lazy"
                           draggable={false}
+                        />
+
+                        <span
+                          className="absolute inset-0 z-10 block touch-pan-y select-none bg-transparent [-webkit-touch-callout:none]"
+                          aria-hidden="true"
+                          onContextMenu={(event) => event.preventDefault()}
+                          onDragStart={(event) => event.preventDefault()}
                         />
                       </span>
 

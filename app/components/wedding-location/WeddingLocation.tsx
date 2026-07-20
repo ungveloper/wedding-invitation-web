@@ -99,7 +99,7 @@ export default function WeddingLocation({
 
     const map = new maps.Map(mapContainerRef.current, {
       center,
-      level: 3,
+      level: 4,
       draggable: false,
       scrollwheel: false,
       disableDoubleClick: true,
