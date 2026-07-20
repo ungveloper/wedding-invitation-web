@@ -12,43 +12,32 @@ import type { InvitationMapLink } from '../../types/invitation';
 import FadeInUp from '../common/FadeInUp';
 import WeddingSectionHeader from '../common/WeddingSectionHeader';
 
-const DEFAULT_NAVER_MAP_CLIENT_ID = 't001dpgy5u';
+type KakaoLatLng = object;
 
-type NaverLatLng = object;
-
-type NaverMapInstance = {
-  setCenter: (position: NaverLatLng) => void;
+type KakaoMapInstance = {
+  setCenter: (position: KakaoLatLng) => void;
+  relayout: () => void;
 };
 
-type NaverMarkerInstance = {
-  setMap: (map: NaverMapInstance | null) => void;
+type KakaoMarkerInstance = {
+  setMap: (map: KakaoMapInstance | null) => void;
 };
 
-type NaverMapsNamespace = {
-  LatLng: new (latitude: number, longitude: number) => NaverLatLng;
+type KakaoMapsNamespace = {
+  load: (callback: () => void) => void;
+  LatLng: new (latitude: number, longitude: number) => KakaoLatLng;
   Map: new (
     element: HTMLElement,
     options: Record<string, unknown>,
-  ) => NaverMapInstance;
-  Marker: new (options: Record<string, unknown>) => NaverMarkerInstance;
-  Event: {
-    trigger: (target: NaverMapInstance, eventName: string) => void;
-  };
-  Position: {
-    TOP_RIGHT: unknown;
-    BOTTOM_LEFT: unknown;
-  };
-  ZoomControlStyle: {
-    SMALL: unknown;
-  };
+  ) => KakaoMapInstance;
+  Marker: new (options: Record<string, unknown>) => KakaoMarkerInstance;
 };
 
 declare global {
   interface Window {
-    naver?: {
-      maps: NaverMapsNamespace;
+    kakao?: {
+      maps: KakaoMapsNamespace;
     };
-    navermap_authFailure?: () => void;
   }
 }
 
@@ -60,7 +49,7 @@ type WeddingLocationProps = {
   latitude: number;
   longitude: number;
   mapLinks: InvitationMapLink[];
-  naverMapClientId?: string;
+  kakaoMapJavaScriptKey?: string;
 };
 
 type MapStatus = 'loading' | 'ready' | 'error';
@@ -73,55 +62,49 @@ export default function WeddingLocation({
   latitude,
   longitude,
   mapLinks,
-  naverMapClientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID ??
-    DEFAULT_NAVER_MAP_CLIENT_ID,
+  kakaoMapJavaScriptKey = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY ?? '',
 }: WeddingLocationProps): React.ReactElement {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [mapStatus, setMapStatus] = useState<MapStatus>('loading');
 
-  useEffect(() => {
-    const previousAuthFailure = window.navermap_authFailure;
+  const [mapStatus, setMapStatus] = useState<MapStatus>(
+    kakaoMapJavaScriptKey ? 'loading' : 'error',
+  );
 
-    window.navermap_authFailure = () => {
-      previousAuthFailure?.();
+  const handleKakaoMapScriptReady = (): void => {
+    const maps = window.kakao?.maps;
+
+    if (!maps) {
       setMapStatus('error');
-    };
+      return;
+    }
 
-    return () => {
-      window.navermap_authFailure = previousAuthFailure;
-    };
-  }, []);
+    maps.load(() => {
+      setMapStatus('ready');
+    });
+  };
 
   useEffect(() => {
     if (mapStatus !== 'ready' || !mapContainerRef.current) {
       return;
     }
 
-    const maps = window.naver?.maps;
+    const maps = window.kakao?.maps;
 
     if (!maps) {
+      setMapStatus('error');
       return;
     }
 
     const center = new maps.LatLng(latitude, longitude);
+
     const map = new maps.Map(mapContainerRef.current, {
       center,
-      zoom: 17,
-      minZoom: 11,
-      maxZoom: 20,
+      level: 3,
       draggable: false,
-      scrollWheel: false,
-      pinchZoom: false,
+      scrollwheel: false,
+      disableDoubleClick: true,
       disableDoubleClickZoom: true,
-      disableDoubleTapZoom: true,
-      disableTwoFingerTapZoom: true,
       keyboardShortcuts: false,
-      zoomControl: false,
-      mapDataControl: false,
-      scaleControl: false,
-      logoControlOptions: {
-        position: maps.Position.BOTTOM_LEFT,
-      },
     });
 
     const marker = new maps.Marker({
@@ -130,8 +113,8 @@ export default function WeddingLocation({
       title: venueName,
     });
 
-    const resizeMap = () => {
-      maps.Event.trigger(map, 'resize');
+    const resizeMap = (): void => {
+      map.relayout();
       map.setCenter(center);
     };
 
@@ -151,22 +134,29 @@ export default function WeddingLocation({
   }, [latitude, longitude, mapStatus, venueName]);
 
   const encodedVenueName = encodeURIComponent(venueName);
-  const naverMapUrl = `https://map.naver.com/p/search/${encodedVenueName}`;
+
+  const kakaoMapUrl =
+    `https://map.kakao.com/link/map/` +
+    `${encodedVenueName},${latitude},${longitude}`;
 
   return (
     <section
       className={`${GowunDodum.className} flex w-full flex-col items-center bg-[#f4f3f1] px-5 pt-12 pb-14`}
       aria-labelledby="wedding-location-title"
     >
-      <Script
-        id="naver-map-sdk"
-        src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent(
-          naverMapClientId,
-        )}&language=ko`}
-        strategy="afterInteractive"
-        onReady={() => setMapStatus('ready')}
-        onError={() => setMapStatus('error')}
-      />
+      {kakaoMapJavaScriptKey ? (
+        <Script
+          id="kakao-map-sdk"
+          src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(
+            kakaoMapJavaScriptKey,
+          )}&autoload=false`}
+          strategy="afterInteractive"
+          onReady={handleKakaoMapScriptReady}
+          onError={() => {
+            setMapStatus('error');
+          }}
+        />
+      ) : null}
 
       <WeddingSectionHeader
         id="wedding-location-title"
@@ -179,6 +169,7 @@ export default function WeddingLocation({
           <p className="m-0 text-lg leading-[1.65] tracking-[-0.04em]">
             {venueName}
           </p>
+
           <p className="m-0 text-lg leading-[1.65] tracking-[-0.04em]">
             {hallName}
           </p>
@@ -190,6 +181,7 @@ export default function WeddingLocation({
           <p className="m-0 text-lg font-normal leading-[1.65] tracking-[-0.04em]">
             {address}
           </p>
+
           <CopyToClipboard
             text={address}
             onCopy={(_, copied) => {
@@ -203,7 +195,7 @@ export default function WeddingLocation({
           >
             <button
               type="button"
-              className="m-0 flex h-7 w-7 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-[#777777] [-webkit-tap-highlight-color:transparent] focus-visible:outline-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:fill-none [&_svg]:stroke-current [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round] [&_svg]:stroke-[1.45]"
+              className="m-0 flex h-7 w-7 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-[#777777] [-webkit-tap-highlight-color:transparent] focus-visible:outline-none [&_svg]:h-4 [&_svg]:w-4 [&_svg]:fill-none [&_svg]:stroke-current [&_svg]:stroke-[1.45] [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round]"
               aria-label="식장 주소 복사"
             >
               <Copy />
@@ -218,20 +210,21 @@ export default function WeddingLocation({
             <div
               ref={mapContainerRef}
               className="pointer-events-none relative aspect-366/294 w-full touch-pan-y overflow-clip rounded-md border border-gray-200 bg-[#ecebea]"
-              aria-label={`${venueName} 네이버 지도`}
+              aria-label={`${venueName} 카카오맵`}
             />
           </FadeInUp>
 
           {mapStatus !== 'ready' ? (
             <div
-              className="absolute inset-x-0 bottom-14 top-0 z-2 flex flex-col items-center justify-center gap-2 bg-[#f3f2f0] text-center leading-normal text-[#777777] [&_a]:font-medium [&_a]:underline [&_a]:underline-offset-[3px]"
+              className="absolute inset-x-0 top-0 bottom-14 z-2 flex flex-col items-center justify-center gap-2 bg-[#f3f2f0] text-center leading-normal text-[#777777] [&_a]:font-medium [&_a]:underline [&_a]:underline-offset-[3px]"
               aria-live="polite"
             >
               {mapStatus === 'error' ? (
                 <>
                   <span>지도를 불러오지 못했습니다.</span>
-                  <a href={naverMapUrl} target="_blank" rel="noreferrer">
-                    네이버 지도에서 보기
+
+                  <a href={kakaoMapUrl} target="_blank" rel="noreferrer">
+                    카카오맵에서 보기
                   </a>
                 </>
               ) : (
@@ -244,10 +237,10 @@ export default function WeddingLocation({
             {mapLinks.map((mapLink) => (
               <Link
                 key={mapLink.id}
+                href={mapLink.href}
                 target="_blank"
                 rel="noreferrer"
-                href={mapLink.href}
-                className="flex items-center gap-1 rounded-md overflow-clip border border-gray-200 bg-gray-50"
+                className="flex items-center gap-1 overflow-clip rounded-md border border-gray-200 bg-gray-50"
               >
                 <div className="flex w-full items-center justify-between px-4 py-3">
                   <div className="flex items-center gap-2">
