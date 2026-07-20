@@ -1,42 +1,95 @@
 'use client';
 
 import { Heart } from 'lucide-react';
+import type { FormEvent } from 'react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { GowunDodum } from '../../lib/fonts';
 import FadeInUp from '../common/FadeInUp';
 import WeddingSectionHeader from '../common/WeddingSectionHeader';
 
 type WeddingRsvpProps = {
-  title?: string;
-  groomName?: string;
-  brideName?: string;
-  month?: number;
-  day?: number;
-  dayOfWeek?: string;
-  time?: string;
-  venueName?: string;
-  hallName?: string;
-  formUrl?: string;
+  invitationId: string;
+  title: string;
+  descriptionLines: string[];
+  submitLabel: string;
+  groomName: string;
+  brideName: string;
+  month: number;
+  day: number;
+  dayOfWeek: string;
+  time: string;
+  venueName: string;
+  hallName: string;
 };
 
-const DEFAULT_FORM_URL =
-  'https://jealous-growth-583.notion.site/ebd//3a27f0af97c280549aaef662fc987fca';
+type SubmitState = 'idle' | 'submitting' | 'success';
+
+const INPUT_CLASS =
+  'w-full rounded-md border border-[#d8d5d0] bg-white px-3.5 py-3 text-base outline-none transition focus:border-[#999999] focus:ring-2 focus:ring-[#999999]/15';
+const LABEL_CLASS = 'block text-sm font-medium text-[#555555]';
 
 export default function WeddingRsvp({
-  title = '참석여부',
-  groomName = '웅재',
-  brideName = '혜정',
-  month = 9,
-  day = 20,
-  dayOfWeek = '일요일',
-  time = '오후 12시',
-  venueName = 'W웨딩 국민연금웨딩홀',
-  hallName = '3층 에메랄드홀',
-  formUrl = DEFAULT_FORM_URL,
+  invitationId,
+  title,
+  descriptionLines,
+  submitLabel,
+  groomName,
+  brideName,
+  month,
+  day,
+  dayOfWeek,
+  time,
+  venueName,
+  hallName,
 }: WeddingRsvpProps): React.ReactElement {
   const [isFormOpen, setIsFormOpen] = useState(false);
-
+  const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const formId = 'wedding-rsvp-form';
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (submitState === 'submitting') {
+      return;
+    }
+
+    setSubmitState('submitting');
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(`/api/invitations/${invitationId}/rsvp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.get('name'),
+          side: formData.get('side'),
+          attendance: formData.get('attendance'),
+          guestCount: formData.get('guestCount'),
+          meal: formData.get('meal'),
+          phone: formData.get('phone'),
+          message: formData.get('message'),
+        }),
+      });
+      const result = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(result.error ?? '참석 여부를 전달하지 못했습니다.');
+      }
+
+      form.reset();
+      setSubmitState('success');
+      toast.success('참석 여부가 전달되었습니다.');
+    } catch (error) {
+      setSubmitState('idle');
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : '참석 여부를 전달하지 못했습니다.',
+      );
+    }
+  }
 
   return (
     <section
@@ -51,10 +104,11 @@ export default function WeddingRsvp({
 
       <FadeInUp>
         <div className="mt-7 text-center text-[15px] leading-[1.9] tracking-[-0.035em] text-[#555555]">
-          <p className="m-0">참석에 부담 가지지 말아주시고,</p>
-          <p className="m-0">편하게 알려주세요.</p>
-          <p className="m-0">저희의 정성을 다하는 준비에 도움이 될 것 같아</p>
-          <p className="m-0">참석 여부를 알려주시면 감사하겠습니다.</p>
+          {descriptionLines.map((line) => (
+            <p key={line} className="m-0">
+              {line}
+            </p>
+          ))}
         </div>
       </FadeInUp>
 
@@ -109,7 +163,7 @@ export default function WeddingRsvp({
 
           <div className="mt-5 text-[15px] leading-[1.75] tracking-[-0.035em] text-[#555555]">
             <p className="m-0">{venueName}</p>
-            <p className="m-0">{hallName}</p>
+            {hallName ? <p className="m-0">{hallName}</p> : null}
           </div>
         </div>
       </FadeInUp>
@@ -124,7 +178,7 @@ export default function WeddingRsvp({
             setIsFormOpen((previous) => !previous);
           }}
         >
-          참석여부 전달하기
+          {submitState === 'success' ? '전달 완료' : submitLabel}
         </button>
       </FadeInUp>
 
@@ -135,18 +189,140 @@ export default function WeddingRsvp({
         }`}
       >
         <div className="overflow-hidden">
-          <div className="overflow-hidden rounded-md border border-[#dedbd6] bg-white">
-            <iframe
-              src={formUrl}
-              title="결혼식 참석 여부 작성 폼"
-              className="block h-150 w-full border-0 bg-white"
-              frameBorder="0"
-              loading="lazy"
-              allowFullScreen
-            />
-          </div>
+          <form
+            className="space-y-4 rounded-md border border-[#dedbd6] bg-[#f8f7f5] p-4"
+            onSubmit={handleSubmit}
+          >
+            <label className={LABEL_CLASS}>
+              이름
+              <input
+                className={`${INPUT_CLASS} mt-1.5`}
+                name="name"
+                autoComplete="name"
+                maxLength={40}
+                required
+              />
+            </label>
+
+            <fieldset>
+              <legend className={LABEL_CLASS}>어느 분의 하객인가요?</legend>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <RadioCard name="side" value="groom" label="신랑측" required />
+                <RadioCard name="side" value="bride" label="신부측" />
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend className={LABEL_CLASS}>참석 여부</legend>
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                <RadioCard
+                  name="attendance"
+                  value="attending"
+                  label="참석"
+                  required
+                />
+                <RadioCard
+                  name="attendance"
+                  value="not-attending"
+                  label="불참"
+                />
+                <RadioCard
+                  name="attendance"
+                  value="undecided"
+                  label="미정"
+                />
+              </div>
+            </fieldset>
+
+            <div className="grid grid-cols-2 gap-3">
+              <label className={LABEL_CLASS}>
+                참석 인원
+                <input
+                  className={`${INPUT_CLASS} mt-1.5`}
+                  name="guestCount"
+                  type="number"
+                  min={0}
+                  max={20}
+                  defaultValue={1}
+                  required
+                />
+              </label>
+
+              <label className={LABEL_CLASS}>
+                식사 여부
+                <select
+                  className={`${INPUT_CLASS} mt-1.5`}
+                  name="meal"
+                  defaultValue="undecided"
+                >
+                  <option value="yes">예정</option>
+                  <option value="no">안 함</option>
+                  <option value="undecided">미정</option>
+                </select>
+              </label>
+            </div>
+
+            <label className={LABEL_CLASS}>
+              연락처
+              <input
+                className={`${INPUT_CLASS} mt-1.5`}
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                maxLength={30}
+                placeholder="선택 입력"
+              />
+            </label>
+
+            <label className={LABEL_CLASS}>
+              전달할 말씀
+              <textarea
+                className={`${INPUT_CLASS} mt-1.5 min-h-24 resize-y`}
+                name="message"
+                maxLength={500}
+                placeholder="선택 입력"
+              />
+            </label>
+
+            <button
+              type="submit"
+              disabled={submitState === 'submitting'}
+              className="w-full cursor-pointer rounded-md bg-[#333333] px-4 py-3.5 text-base font-medium text-white disabled:cursor-wait disabled:opacity-60"
+            >
+              {submitState === 'submitting' ? '전달 중...' : submitLabel}
+            </button>
+          </form>
         </div>
       </div>
     </section>
+  );
+}
+
+type RadioCardProps = {
+  name: string;
+  value: string;
+  label: string;
+  required?: boolean;
+};
+
+function RadioCard({
+  name,
+  value,
+  label,
+  required = false,
+}: RadioCardProps): React.ReactElement {
+  return (
+    <label className="cursor-pointer">
+      <input
+        className="peer sr-only"
+        type="radio"
+        name={name}
+        value={value}
+        required={required}
+      />
+      <span className="flex min-h-11 items-center justify-center rounded-md border border-[#d8d5d0] bg-white text-sm transition peer-checked:border-[#777777] peer-checked:bg-[#eceae7] peer-focus-visible:ring-2 peer-focus-visible:ring-[#999999]/30">
+        {label}
+      </span>
+    </label>
   );
 }

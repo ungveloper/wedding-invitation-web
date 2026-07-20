@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { toast } from 'sonner';
 import { GowunDodum } from '../../lib/fonts';
+import type { InvitationMapLink } from '../../types/invitation';
 import FadeInUp from '../common/FadeInUp';
 import WeddingSectionHeader from '../common/WeddingSectionHeader';
 
@@ -52,61 +53,26 @@ declare global {
 }
 
 type WeddingLocationProps = {
-  venueName?: string;
-  hallName?: string;
-  address?: string;
-  latitude?: number;
-  longitude?: number;
+  title: string;
+  venueName: string;
+  hallName: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  mapLinks: InvitationMapLink[];
   naverMapClientId?: string;
 };
 
 type MapStatus = 'loading' | 'ready' | 'error';
 
-type MapLink = {
-  id: string;
-  name: string;
-  href: string;
-  imageSrc: string;
-  imageAlt: string;
-};
-
-const MAP_LINKS: readonly MapLink[] = [
-  {
-    id: 'naver',
-    name: '네이버지도',
-    href: 'https://map.naver.com/p/directions/-/3AHG0P,2z9P1f,W%EC%9B%A8%EB%94%A9%20%EA%B5%AD%EB%AF%BC%EC%97%B0%EA%B8%88%EC%9B%A8%EB%94%A9%ED%99%80,11881122,PLACE_POI/-/transit?c=15.00,0,0,0,dh',
-    imageSrc: '/images/location/navermap.png',
-    imageAlt: '네이버지도',
-  },
-  {
-    id: 'kakao',
-    name: '카카오맵',
-    href: 'https://map.kakao.com/?map_type=TYPE_MAP&target=car&rt=,,972685.000000339,471972.00000000885&rt1=&rt2=W%EC%9B%A8%EB%94%A9%20%EA%B5%AD%EB%AF%BC%EC%97%B0%EA%B8%88%EC%9B%A8%EB%94%A9%ED%99%80&rtIds=,11097221',
-    imageSrc: '/images/location/kakaomap.png',
-    imageAlt: '카카오맵',
-  },
-  {
-    id: 'tmap',
-    name: '티맵',
-    href: 'https://apis.openapi.sk.com/tmap/app/routes?appKey=TJfHFoG4TQ3L1V2DNZ1Vj2sVFVVIvOWU6GlF3Oon&name=W웨딩국민연금웨딩홀&lon=129.0756194&lat=35.1778497',
-    imageSrc: '/images/location/tmap.png',
-    imageAlt: '티맵',
-  },
-  {
-    id: 'google',
-    name: '구글맵',
-    href: 'https://www.google.co.kr/maps/dir//%EB%B6%80%EC%82%B0%EA%B4%91%EC%97%AD%EC%8B%9C+%EC%97%B0%EC%A0%9C%EA%B5%AC+%EC%A4%91%EC%95%99%EB%8C%80%EB%A1%9C+1000+W%EC%9B%A8%EB%94%A9+%EA%B5%AD%EB%AF%BC%EC%97%B0%EA%B8%88%EC%9B%A8%EB%94%A9%ED%99%80/data=!4m16!1m7!3m6!1s0x35689354a2ad7b81:0x8dccda5788b92fb1!2zV-ybqOuUqSDqta3rr7zsl7DquIjsm6jrlKntmYA!8m2!3d35.1779992!4d129.0757805!16s%2Fg%2F1vcq5gx3!4m7!1m0!1m5!1m1!1s0x35689354a2ad7b81:0x8dccda5788b92fb1!2m2!1d129.0757805!2d35.1779992?entry=ttu&g_ep=EgoyMDI2MDcxNS4wIKXMDSoASAFQAw%3D%3D',
-    imageSrc: '/images/location/googlemap.png',
-    imageAlt: '구글맵',
-  },
-];
-
 export default function WeddingLocation({
-  venueName = '식장 이름',
-  hallName = '웨딩홀 이름',
-  address = '주소',
-  latitude = 35.1778497,
-  longitude = 129.0756194,
+  title,
+  venueName,
+  hallName,
+  address,
+  latitude,
+  longitude,
+  mapLinks,
   naverMapClientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID ??
     DEFAULT_NAVER_MAP_CLIENT_ID,
 }: WeddingLocationProps): React.ReactElement {
@@ -205,7 +171,7 @@ export default function WeddingLocation({
       <WeddingSectionHeader
         id="wedding-location-title"
         className="space-y-5"
-        title="오시는 길"
+        title={title}
       />
 
       <FadeInUp>
@@ -275,7 +241,7 @@ export default function WeddingLocation({
           ) : null}
 
           <div className={`grid grid-cols-2 gap-0 ${GowunDodum.className}`}>
-            {MAP_LINKS.map((mapLink) => (
+            {mapLinks.map((mapLink) => (
               <Link
                 key={mapLink.id}
                 target="_blank"

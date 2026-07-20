@@ -21,30 +21,13 @@ type WeddingGalleryImage = {
 };
 
 type WeddingGalleryProps = {
-  title?: string;
-  images?: readonly WeddingGalleryImage[];
+  title: string;
+  images: readonly WeddingGalleryImage[];
 };
 
 type PolaroidStyle = CSSProperties & {
   '--polaroid-rotation': string;
 };
-
-const DEFAULT_IMAGES: readonly WeddingGalleryImage[] = [
-  { src: '/images/gallery/1.png', alt: '웨딩 갤러리 이미지 1' },
-  { src: '/images/gallery/2.png', alt: '웨딩 갤러리 이미지 2' },
-  { src: '/images/gallery/3.png', alt: '웨딩 갤러리 이미지 3' },
-  { src: '/images/gallery/4.png', alt: '웨딩 갤러리 이미지 4' },
-  { src: '/images/gallery/5.png', alt: '웨딩 갤러리 이미지 5' },
-  { src: '/images/gallery/6.png', alt: '웨딩 갤러리 이미지 6' },
-  { src: '/images/gallery/7.png', alt: '웨딩 갤러리 이미지 7' },
-  { src: '/images/gallery/8.png', alt: '웨딩 갤러리 이미지 8' },
-  { src: '/images/gallery/9.png', alt: '웨딩 갤러리 이미지 9' },
-  { src: '/images/gallery/10.png', alt: '웨딩 갤러리 이미지 10' },
-  { src: '/images/gallery/11.png', alt: '웨딩 갤러리 이미지 11' },
-  { src: '/images/gallery/12.png', alt: '웨딩 갤러리 이미지 12' },
-  { src: '/images/gallery/13.png', alt: '웨딩 갤러리 이미지 13' },
-  { src: '/images/gallery/14.png', alt: '웨딩 갤러리 이미지 14' },
-];
 
 const POLAROID_ROTATIONS = [
   -3, 2, -2, 3, -2.5, 1.5, -1.5, 2.5, -3.5, 1, -2, 3.5, -1, 2,
@@ -87,8 +70,8 @@ const LIGHTBOX_BUTTON_CLASS_NAME = [
 ].join(' ');
 
 export default function WeddingGallery({
-  title = '웨딩 갤러리',
-  images = DEFAULT_IMAGES,
+  title,
+  images,
 }: WeddingGalleryProps): React.ReactElement {
   const pointerStartXRef = useRef<number | null>(null);
 
@@ -100,7 +83,7 @@ export default function WeddingGallery({
   const portalRoot = typeof document === 'undefined' ? null : document.body;
 
   const galleryImages = useMemo(
-    () => (images.length > 0 ? [...images] : [...DEFAULT_IMAGES]),
+    () => [...images],
     [images],
   );
 

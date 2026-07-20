@@ -7,11 +7,11 @@ import Handwriting from './components/handwriting/Handwriting';
 import { Solinsunny } from './lib/fonts';
 
 type CoverProps = {
-  photoSrc?: string;
-  statement?: string;
-  date?: string;
-  groomLabel?: string;
-  brideLabel?: string;
+  photoSrc: string;
+  statement: string;
+  date: string;
+  groomLabel: string;
+  brideLabel: string;
 };
 
 type CoverStyle = CSSProperties & {
@@ -34,11 +34,11 @@ const HEART_MOTIONS = [
 ] as const;
 
 export default function Cover({
-  photoSrc = '/images/cover/heart-frame-photo.png',
-  statement = 'Our wedding day',
-  date = 'on September 20, 2026',
-  groomLabel = 'Groom',
-  brideLabel = 'Bride',
+  photoSrc,
+  statement,
+  date,
+  groomLabel,
+  brideLabel,
 }: CoverProps): ReactElement {
   const coverRef = useRef<HTMLElement>(null);
   const groomFloatRef = useRef<HTMLDivElement>(null);

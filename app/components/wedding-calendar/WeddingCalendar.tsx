@@ -28,9 +28,9 @@ const COUNTER_CLASS = [
 ].join(' ');
 
 type WeddingCalendarProps = {
-  targetDate?: string;
-  groomName?: string;
-  brideName?: string;
+  targetDate: string;
+  groomName: string;
+  brideName: string;
 };
 
 type Countdown = {
@@ -130,9 +130,9 @@ function createCalendarCells(
 }
 
 export default function WeddingCalendar({
-  targetDate = '2026-09-20T12:00:00+09:00',
-  groomName = '웅재',
-  brideName = '혜정',
+  targetDate,
+  groomName,
+  brideName,
 }: WeddingCalendarProps): React.ReactElement {
   const [countdown, setCountdown] = useState<Countdown>(INITIAL_COUNTDOWN);
 

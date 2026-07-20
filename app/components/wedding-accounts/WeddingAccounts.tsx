@@ -16,56 +16,19 @@ export type WeddingAccount = {
 };
 
 type WeddingAccountsProps = {
-  title?: string;
-  groomAccounts?: WeddingAccount[];
-  brideAccounts?: WeddingAccount[];
+  title: string;
+  groomSectionTitle: string;
+  brideSectionTitle: string;
+  groomAccounts: WeddingAccount[];
+  brideAccounts: WeddingAccount[];
 };
 
-const DEFAULT_GROOM_ACCOUNTS: WeddingAccount[] = [
-  {
-    id: 'groom',
-    role: '신랑',
-    accountNumber: '3333-13-3538206',
-    bank: '카카오뱅크',
-    holder: '지웅재',
-  },
-  {
-    id: 'groom-mother',
-    role: '신랑 어머니',
-    accountNumber: '3333-21-0312583',
-    bank: '카카오뱅크',
-    holder: '박순영',
-  },
-];
-
-const DEFAULT_BRIDE_ACCOUNTS: WeddingAccount[] = [
-  {
-    id: 'bride',
-    role: '신부',
-    accountNumber: '3333-04-3426904',
-    bank: '카카오뱅크',
-    holder: '송혜정',
-  },
-  {
-    id: 'bride-father',
-    role: '신부 아버지',
-    accountNumber: '3120031056611',
-    bank: '농협은행',
-    holder: '송종무',
-  },
-  {
-    id: 'bride-mother',
-    role: '신부 어머니',
-    accountNumber: '70902074370',
-    bank: '수협',
-    holder: '지경화',
-  },
-];
-
 export default function WeddingAccounts({
-  title = '마음 전하실 곳',
-  groomAccounts = DEFAULT_GROOM_ACCOUNTS,
-  brideAccounts = DEFAULT_BRIDE_ACCOUNTS,
+  title,
+  groomSectionTitle,
+  brideSectionTitle,
+  groomAccounts,
+  brideAccounts,
 }: WeddingAccountsProps): React.ReactElement {
   return (
     <section
@@ -82,14 +45,14 @@ export default function WeddingAccounts({
         <FadeInUp>
           <AccountAccordion
             id="groom-accounts"
-            title="신랑측 계좌번호"
+            title={groomSectionTitle}
             accounts={groomAccounts}
           />
         </FadeInUp>
         <FadeInUp>
           <AccountAccordion
             id="bride-accounts"
-            title="신부측 계좌번호"
+            title={brideSectionTitle}
             accounts={brideAccounts}
           />
         </FadeInUp>

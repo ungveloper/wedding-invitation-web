@@ -10,7 +10,6 @@ import HeartImage from './components/heart-image/HeartImage';
 import { GowunDodum } from './lib/fonts';
 
 const DEFAULT_KAKAO_JAVASCRIPT_KEY = '310d015109a750e6c26da3906be21d48';
-const DEFAULT_INVITATION_URL = 'https://wedding-invitation-web-drab.vercel.app';
 
 type KakaoWebLink = {
   mobileWebUrl: string;
@@ -45,30 +44,41 @@ declare global {
   }
 }
 
+type SignoffProps = {
+  invitationUrl: string;
+  imageSrc: string;
+  imageAlt: string;
+  kakaoTitle: string;
+  kakaoDescription: string;
+  kakaoImage: string;
+  kakaoButtonLabel: string;
+  shareButtonLabel: string;
+  copyButtonLabel: string;
+};
+
 const KAKAO_JAVASCRIPT_KEY =
   process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY ?? DEFAULT_KAKAO_JAVASCRIPT_KEY;
-
-const INVITATION_URL = (
-  process.env.NEXT_PUBLIC_INVITATION_URL ?? DEFAULT_INVITATION_URL
-).replace(/\/$/, '');
 
 function blockMediaInteraction(event: SyntheticEvent): void {
   event.preventDefault();
   event.stopPropagation();
 }
 
-export default function Signoff(): React.ReactElement {
+export default function Signoff({
+  invitationUrl,
+  imageSrc,
+  imageAlt,
+  kakaoTitle,
+  kakaoDescription,
+  kakaoImage,
+  kakaoButtonLabel,
+  shareButtonLabel,
+  copyButtonLabel,
+}: SignoffProps): React.ReactElement {
   function initializeKakao(): void {
     const kakao = window.Kakao;
 
-    if (!kakao) {
-      return;
-    }
-
-    if (!KAKAO_JAVASCRIPT_KEY) {
-      console.error(
-        'NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY 환경변수가 설정되지 않았습니다.',
-      );
+    if (!kakao || !KAKAO_JAVASCRIPT_KEY) {
       return;
     }
 
@@ -78,13 +88,6 @@ export default function Signoff(): React.ReactElement {
   }
 
   function handleKakaoShare(): void {
-    if (!INVITATION_URL) {
-      window.alert(
-        'NEXT_PUBLIC_INVITATION_URL 환경변수가 설정되지 않았습니다.',
-      );
-      return;
-    }
-
     initializeKakao();
 
     const kakao = window.Kakao;
@@ -100,20 +103,20 @@ export default function Signoff(): React.ReactElement {
       kakao.Share.sendDefault({
         objectType: 'feed',
         content: {
-          title: '저희 두 사람 결혼합니다!',
-          description: '소중한 분들을 저희의 시작에 초대합니다.',
-          imageUrl: `${INVITATION_URL}/images/signoff/bowing.png`,
+          title: kakaoTitle,
+          description: kakaoDescription,
+          imageUrl: new URL(kakaoImage, invitationUrl).toString(),
           link: {
-            mobileWebUrl: INVITATION_URL,
-            webUrl: INVITATION_URL,
+            mobileWebUrl: invitationUrl,
+            webUrl: invitationUrl,
           },
         },
         buttons: [
           {
-            title: '모바일 청첩장 보기',
+            title: kakaoButtonLabel,
             link: {
-              mobileWebUrl: INVITATION_URL,
-              webUrl: INVITATION_URL,
+              mobileWebUrl: invitationUrl,
+              webUrl: invitationUrl,
             },
           },
         ],
@@ -150,16 +153,16 @@ export default function Signoff(): React.ReactElement {
         <FadeInUp>
           <div className="relative aspect-64/95 w-full overflow-hidden select-none [-webkit-touch-callout:none]">
             <Image
-              src="/images/signoff/bowing.png"
-              alt="신랑과 신부가 인사하는 모습"
+              src={imageSrc}
+              alt={imageAlt}
               fill
               draggable={false}
-              className="pointer-events-none select-none object-cover [-webkit-user-drag:none] [-webkit-touch-callout:none]"
+              className="pointer-events-none object-cover select-none [-webkit-user-drag:none] [-webkit-touch-callout:none]"
             />
 
             <div
               aria-hidden="true"
-              className="absolute inset-0 z-10 touch-pan-y select-none bg-transparent [-webkit-touch-callout:none]"
+              className="absolute inset-0 z-10 touch-pan-y bg-transparent select-none [-webkit-touch-callout:none]"
               onClick={blockMediaInteraction}
               onAuxClick={blockMediaInteraction}
               onDoubleClick={blockMediaInteraction}
@@ -174,9 +177,9 @@ export default function Signoff(): React.ReactElement {
             <button
               type="button"
               onClick={handleKakaoShare}
-              className="px-5 py-4.5 flex w-full justify-between items-center gap-2 rounded-md border border-[#0000000d] bg-[#F4F3F1] cursor-pointer"
+              className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-[#0000000d] bg-[#F4F3F1] px-5 py-4.5"
             >
-              <span>카카오톡 공유하기</span>
+              <span>{shareButtonLabel}</span>
               <Image
                 src="/images/signoff/kakao.svg"
                 alt=""
@@ -188,13 +191,12 @@ export default function Signoff(): React.ReactElement {
           </FadeInUp>
 
           <FadeInUp>
-            <CopyToClipboard text={INVITATION_URL} onCopy={handleCopy}>
+            <CopyToClipboard text={invitationUrl} onCopy={handleCopy}>
               <button
                 type="button"
-                disabled={!INVITATION_URL}
-                className="px-5 py-4.5 flex w-full justify-between items-center gap-2 rounded-md border border-[#0000000d] bg-[#F4F3F1] cursor-pointer"
+                className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-[#0000000d] bg-[#F4F3F1] px-5 py-4.5"
               >
-                <span>청첩장 링크 복사하기</span>
+                <span>{copyButtonLabel}</span>
                 <Image
                   src="/images/signoff/link.svg"
                   alt=""

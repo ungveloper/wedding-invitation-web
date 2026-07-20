@@ -141,8 +141,6 @@ export default function BackgroundMusic({
     userPausedRef.current = false;
     wasPlayingBeforeBackgroundRef.current = false;
 
-    setHasError(false);
-    setIsPlaying(false);
   }, [resolvedSrc]);
 
   /**

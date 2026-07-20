@@ -7,7 +7,7 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState,
+  useSyncExternalStore,
 } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -32,7 +32,11 @@ export default function OpeningVideo({
   const videoRef = useRef<HTMLVideoElement>(null);
   const hasFinishedRef = useRef(false);
 
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const portalRoot = isMounted ? document.body : null;
   const isVideoInteractive = shouldPlay || isActive;
@@ -64,15 +68,13 @@ export default function OpeningVideo({
     finishVideo();
   };
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!isMounted) {
       return;
     }
 
+    const video = videoRef.current;
     const htmlStyle = document.documentElement.style;
     const bodyStyle = document.body.style;
 
@@ -108,7 +110,7 @@ export default function OpeningVideo({
 
       window.removeEventListener('keydown', handleKeyDown);
 
-      videoRef.current?.pause();
+      video?.pause();
     };
   }, [finishVideo, isMounted, isVideoInteractive]);
 

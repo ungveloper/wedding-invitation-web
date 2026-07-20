@@ -1,0 +1,228 @@
+{
+  "template": {
+    "id": 1,
+    "name": "시안 1 · 하트 프레임",
+    "description": "현재 page.tsx에 구현된 하트 프레임 모바일 청첩장",
+    "previewImage": "/images/common/og-image.png",
+    "published": true,
+    "sortOrder": 1
+  },
+  "invitation": {
+    "slug": "0920",
+    "ownerEmail": "93y0916@gmail.com",
+    "status": "published",
+    "couple": {
+      "groom": {
+        "name": "웅재",
+        "fullName": "지웅재",
+        "fatherName": "지정호",
+        "motherName": "박순영",
+        "relationLabel": "아들"
+      },
+      "bride": {
+        "name": "혜정",
+        "fullName": "송혜정",
+        "fatherName": "송종무",
+        "motherName": "지경화",
+        "relationLabel": "딸"
+      }
+    },
+    "event": {
+      "dateTime": "2026-09-20T12:00:00+09:00",
+      "dateLabel": "2026년 9월 20일",
+      "month": 9,
+      "day": 20,
+      "dayOfWeek": "일요일",
+      "timeLabel": "오후 12시",
+      "venueName": "W웨딩 국민연금웨딩홀",
+      "hallName": "3층 에메랄드홀",
+      "address": "부산 연제구 중앙대로 1000",
+      "latitude": 35.1778497,
+      "longitude": 129.0756194
+    },
+    "metadata": {
+      "title": "웅재♥혜정, 결혼합니다!",
+      "description": "2026년 9월 20일, 저희 두 사람의 새로운 시작에 소중한 분들을 초대합니다.",
+      "siteName": "웅재♥혜정 모바일 청첩장",
+      "ogImage": "/images/common/og-image.png"
+    },
+    "settings": {
+      "allowedTemplateIds": [1],
+      "rootAccessMode": "redirect-random"
+    },
+    "content": {
+      "intro": {
+        "variant": "curtain",
+        "duration": 1.45,
+        "delay": 0.2,
+        "autoOpen": true,
+        "lockScroll": false,
+        "eyebrow": "Wedding",
+        "title": "Invitation",
+        "openLabel": "터치하여 열기",
+        "preOpenOffset": 1,
+        "openingVideoSrc": "/images/signoff/signoff.mp4"
+      },
+      "backgroundMusic": {
+        "variant": "wedding",
+        "src": "/audio/background-music/would_you_marry_me.mp3",
+        "autoPlay": true,
+        "loop": true,
+        "volume": 0.5,
+        "showControl": true
+      },
+      "cover": {
+        "photoSrc": "/images/cover/heart-frame-photo.png",
+        "statement": "Our wedding day",
+        "date": "on September 20, 2026",
+        "groomLabel": "Groom",
+        "brideLabel": "Bride"
+      },
+      "greeting": {
+        "quote": "“당신은 내가 더 좋은 사람이 되고 싶게 만들어요.”",
+        "quoteSource": "- 영화 〈이보다 더 좋을 순 없다〉 -",
+        "messages": [
+          "서로를 만나기 전보다",
+          "더 나은 내일을 꿈꾸게 되었습니다.",
+          "부족한 부분을 채워주고,",
+          "잘하는 부분은 아낌없이 응원하며",
+          "매일 조금씩 더 좋은 사람이 되어",
+          "곁을 지키겠습니다.",
+          "저희 두 사람이 하나로 거듭나는 날,",
+          "함께해 주시길 바랍니다."
+        ],
+        "family": {
+          "groomParentsLabel": "지정호·박순영의",
+          "brideParentsLabel": "송종무·지경화의"
+        }
+      },
+      "calendar": {
+        "enabled": true
+      },
+      "gallery": {
+        "title": "웨딩 갤러리",
+        "images": [
+          { "src": "/images/gallery/1.png", "alt": "웨딩 갤러리 이미지 1" },
+          { "src": "/images/gallery/2.png", "alt": "웨딩 갤러리 이미지 2" },
+          { "src": "/images/gallery/3.png", "alt": "웨딩 갤러리 이미지 3" },
+          { "src": "/images/gallery/4.png", "alt": "웨딩 갤러리 이미지 4" },
+          { "src": "/images/gallery/5.png", "alt": "웨딩 갤러리 이미지 5" },
+          { "src": "/images/gallery/6.png", "alt": "웨딩 갤러리 이미지 6" },
+          { "src": "/images/gallery/7.png", "alt": "웨딩 갤러리 이미지 7" },
+          { "src": "/images/gallery/8.png", "alt": "웨딩 갤러리 이미지 8" },
+          { "src": "/images/gallery/9.png", "alt": "웨딩 갤러리 이미지 9" },
+          { "src": "/images/gallery/10.png", "alt": "웨딩 갤러리 이미지 10" },
+          { "src": "/images/gallery/11.png", "alt": "웨딩 갤러리 이미지 11" },
+          { "src": "/images/gallery/12.png", "alt": "웨딩 갤러리 이미지 12" },
+          { "src": "/images/gallery/13.png", "alt": "웨딩 갤러리 이미지 13" },
+          { "src": "/images/gallery/14.png", "alt": "웨딩 갤러리 이미지 14" }
+        ]
+      },
+      "location": {
+        "title": "오시는 길",
+        "mapLinks": [
+          {
+            "id": "naver",
+            "name": "네이버지도",
+            "href": "https://map.naver.com/p/directions/-/3AHG0P,2z9P1f,W%EC%9B%A8%EB%94%A9%20%EA%B5%AD%EB%AF%BC%EC%97%B0%EA%B8%88%EC%9B%A8%EB%94%A9%ED%99%80,11881122,PLACE_POI/-/transit?c=15.00,0,0,0,dh",
+            "imageSrc": "/images/location/navermap.png",
+            "imageAlt": "네이버지도"
+          },
+          {
+            "id": "kakao",
+            "name": "카카오맵",
+            "href": "https://map.kakao.com/?map_type=TYPE_MAP&target=car&rt=,,972685.000000339,471972.00000000885&rt1=&rt2=W%EC%9B%A8%EB%94%A9%20%EA%B5%AD%EB%AF%BC%EC%97%B0%EA%B8%88%EC%9B%A8%EB%94%A9%ED%99%80&rtIds=,11097221",
+            "imageSrc": "/images/location/kakaomap.png",
+            "imageAlt": "카카오맵"
+          },
+          {
+            "id": "tmap",
+            "name": "티맵",
+            "href": "https://apis.openapi.sk.com/tmap/app/routes?appKey=TJfHFoG4TQ3L1V2DNZ1Vj2sVFVVIvOWU6GlF3Oon&name=W웨딩국민연금웨딩홀&lon=129.0756194&lat=35.1778497",
+            "imageSrc": "/images/location/tmap.png",
+            "imageAlt": "티맵"
+          },
+          {
+            "id": "google",
+            "name": "구글맵",
+            "href": "https://www.google.co.kr/maps/dir//%EB%B6%80%EC%82%B0%EA%B4%91%EC%97%AD%EC%8B%9C+%EC%97%B0%EC%A0%9C%EA%B5%AC+%EC%A4%91%EC%95%99%EB%8C%80%EB%A1%9C+1000+W%EC%9B%A8%EB%94%A9+%EA%B5%AD%EB%AF%BC%EC%97%B0%EA%B8%88%EC%9B%A8%EB%94%A9%ED%99%80/data=!4m16!1m7!3m6!1s0x35689354a2ad7b81:0x8dccda5788b92fb1!2zV-ybqOuUqSDqta3rr7zsl7DquIjsm6jrlKntmYA!8m2!3d35.1779992!4d129.0757805!16s%2Fg%2F1vcq5gx3!4m7!1m0!1m5!1m1!1s0x35689354a2ad7b81:0x8dccda5788b92fb1!2m2!1d129.0757805!2d35.1779992?entry=ttu",
+            "imageSrc": "/images/location/googlemap.png",
+            "imageAlt": "구글맵"
+          }
+        ]
+      },
+      "accounts": {
+        "enabled": true,
+        "title": "마음 전하실 곳",
+        "groomSectionTitle": "신랑측 계좌번호",
+        "brideSectionTitle": "신부측 계좌번호",
+        "groom": [
+          {
+            "id": "groom",
+            "role": "신랑",
+            "accountNumber": "3333-13-3538206",
+            "bank": "카카오뱅크",
+            "holder": "지웅재"
+          },
+          {
+            "id": "groom-mother",
+            "role": "신랑 어머니",
+            "accountNumber": "3333-21-0312583",
+            "bank": "카카오뱅크",
+            "holder": "박순영"
+          }
+        ],
+        "bride": [
+          {
+            "id": "bride",
+            "role": "신부",
+            "accountNumber": "3333-04-3426904",
+            "bank": "카카오뱅크",
+            "holder": "송혜정"
+          },
+          {
+            "id": "bride-father",
+            "role": "신부 아버지",
+            "accountNumber": "3120031056611",
+            "bank": "농협은행",
+            "holder": "송종무"
+          },
+          {
+            "id": "bride-mother",
+            "role": "신부 어머니",
+            "accountNumber": "70902074370",
+            "bank": "수협",
+            "holder": "지경화"
+          }
+        ]
+      },
+      "rsvp": {
+        "enabled": true,
+        "title": "참석여부",
+        "descriptionLines": [
+          "참석에 부담 가지지 말아주시고,",
+          "편하게 알려주세요.",
+          "저희의 정성을 다하는 준비에 도움이 될 것 같아",
+          "참석 여부를 알려주시면 감사하겠습니다."
+        ],
+        "submitLabel": "참석여부 전달하기"
+      },
+      "guestbook": {
+        "enabled": true,
+        "title": "방명록",
+        "description": "두 사람의 새로운 시작을 축하하는 따뜻한 마음을 남겨주세요.",
+        "submitLabel": "축하 메시지 남기기"
+      },
+      "signoff": {
+        "imageSrc": "/images/signoff/bowing.png",
+        "imageAlt": "신랑과 신부가 인사하는 모습",
+        "kakaoTitle": "저희 두 사람 결혼합니다!",
+        "kakaoDescription": "소중한 분들을 저희의 시작에 초대합니다.",
+        "kakaoImage": "/images/signoff/bowing.png",
+        "kakaoButtonLabel": "모바일 청첩장 보기",
+        "shareButtonLabel": "카카오톡 공유하기",
+        "copyButtonLabel": "청첩장 링크 복사하기"
+      }
+    }
+  }
+}
