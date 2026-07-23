@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useState } from 'react';
 import Cover from '@/app/Cover';
 import Greeting from '@/app/Greeting';
 import Signoff from '@/app/Signoff';
+import VisitorTracker from '@/app/components/analytics/VisitorTracker';
 import BackgroundMusic from '@/app/components/background-music/BackgroundMusic';
 import FadeInUp from '@/app/components/common/FadeInUp';
 import Intro from '@/app/components/intro/Intro';
@@ -14,8 +14,8 @@ import WeddingGallery from '@/app/components/wedding-gallery/WeddingGallery';
 import WeddingGuestbook from '@/app/components/wedding-guestbook/WeddingGuestbook';
 import WeddingLocation from '@/app/components/wedding-location/WeddingLocation';
 import WeddingRsvp from '@/app/components/wedding-rsvp/WeddingRsvp';
-import VisitorTracker from '@/app/components/analytics/VisitorTracker';
 import type { InvitationData } from '@/app/types/invitation';
+import { useCallback, useState } from 'react';
 
 type TemplateOneProps = {
   invitation: InvitationData;

@@ -40,7 +40,7 @@ export default function Greeting({
       </FadeInUp>
 
       <FadeInUp>
-        <div className="mx-auto my-10 h-px w-[20vw] bg-[repeating-linear-gradient(to_right,#999_0_4px,transparent_4px_10px)] bg-bottom bg-no-repeat bg-size-[100%_2px]" />
+        <div className="mx-auto my-10 h-px w-[20%] bg-[repeating-linear-gradient(to_right,#999_0_4px,transparent_4px_10px)] bg-bottom bg-no-repeat bg-size-[100%_2px]" />
       </FadeInUp>
 
       <FadeInUp>

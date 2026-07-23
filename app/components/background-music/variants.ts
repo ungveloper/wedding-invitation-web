@@ -44,7 +44,7 @@ export const variants = {
     title: 'Wedding background music',
     autoPlay: true,
     loop: true,
-    volume: 0.5,
+    volume: 1,
     preload: 'auto',
     startOnFirstInteraction: true,
     showControl: true,
