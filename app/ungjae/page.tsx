@@ -696,8 +696,8 @@ function UngjaeLocation(): React.ReactElement {
         </div>
       </FadeInUp>
 
-      <FadeInUp>
-        <div className="mt-10 space-y-8 text-center">
+      <div className="mt-10 space-y-8 text-center">
+        <FadeInUp>
           <div>
             <h3 className="font-bold text-lg">🚗 주차장</h3>
             <div className="mt-2 space-y-1.5 text-base">
@@ -705,7 +705,13 @@ function UngjaeLocation(): React.ReactElement {
               <p>* 주차장 만차시 시청/이마트/연제구청 주차장 이용</p>
             </div>
           </div>
+        </FadeInUp>
+
+        <FadeInUp>
           <div className="mx-auto w-[40%] h-px bg-[repeating-linear-gradient(to_right,#999_0_4px,transparent_4px_10px)] bg-bottom bg-no-repeat bg-size-[100%_2px] opacity-50"></div>
+        </FadeInUp>
+
+        <FadeInUp>
           <div>
             <h3 className="font-bold text-lg">🚌 버스 노선</h3>
             <div className="mt-2 space-y-1.5 text-base">
@@ -713,24 +719,36 @@ function UngjaeLocation(): React.ReactElement {
               <p>20, 55, 57, 62, 131-1, 305 (연제구청 하차)</p>
             </div>
           </div>
+        </FadeInUp>
+
+        <FadeInUp>
           <div className="mx-auto w-[40%] h-px bg-[repeating-linear-gradient(to_right,#999_0_4px,transparent_4px_10px)] bg-bottom bg-no-repeat bg-size-[100%_2px] opacity-50"></div>
+        </FadeInUp>
+
+        <FadeInUp>
           <div>
             <h3 className="font-bold text-lg">🚊 지하철</h3>
             <div className="mt-2 space-y-1.5 text-base">
               <p>1호선 시청역 2번 출구 (도보 2분 거리)</p>
             </div>
           </div>
+        </FadeInUp>
+
+        <FadeInUp>
           <div className="mx-auto w-[40%] h-px bg-[repeating-linear-gradient(to_right,#999_0_4px,transparent_4px_10px)] bg-bottom bg-no-repeat bg-size-[100%_2px] opacity-50"></div>
+        </FadeInUp>
+
+        <FadeInUp>
           <div>
-            <h3 className="font-bold text-lg">☎️ 문의 전화</h3>
+            <h3 className="font-bold text-lg">📞 문의 전화</h3>
             <div className="mt-2 space-y-1.5 text-base">
               <Link target="_blank" href={`tel:0516687979`}>
                 <p>051-668-7979</p>
               </Link>
             </div>
           </div>
-        </div>
-      </FadeInUp>
+        </FadeInUp>
+      </div>
     </section>
   );
 }
