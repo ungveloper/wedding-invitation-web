@@ -145,9 +145,11 @@ const content = {
   backgroundMusic: {
     variant: 'wedding' as const,
     src: '/audio/background-music/mother_to_daughter.mp3',
-    autoPlay: false,
+    autoPlay: true,
     loop: true,
-    volume: 0.5,
+    volume: 1,
+    preload: 'auto' as const,
+    startOnFirstInteraction: true,
     showControl: true,
   },
 
@@ -318,7 +320,7 @@ function UngjaeGreeting(): React.ReactElement {
 
   return (
     <section
-      className={`mt-14 flex flex-col items-center ${GowunDodum.className}`}
+      className={`mt-10 flex flex-col items-center ${GowunDodum.className}`}
     >
       <FadeInUp>
         <WeddingRibbon />
@@ -908,6 +910,8 @@ function UngjaeSignoff(): React.ReactElement {
 }
 
 export default function UngJae(): React.ReactElement {
+  const [hasEntered, setHasEntered] = useState(false);
+
   return (
     <>
       <BackgroundMusic
@@ -916,6 +920,10 @@ export default function UngJae(): React.ReactElement {
         autoPlay={content.backgroundMusic.autoPlay}
         loop={content.backgroundMusic.loop}
         volume={content.backgroundMusic.volume}
+        preload={content.backgroundMusic.preload}
+        startOnFirstInteraction={
+          content.backgroundMusic.startOnFirstInteraction
+        }
         showControl={content.backgroundMusic.showControl}
       />
 
@@ -929,6 +937,20 @@ export default function UngJae(): React.ReactElement {
             preload="auto"
             className="h-full w-full object-cover"
           />
+
+          {!hasEntered ? (
+            <button
+              type="button"
+              className={`absolute inset-0 z-10 flex cursor-pointer items-end justify-center bg-black/10 pb-10 text-white ${GowunDodum.className}`}
+              onClick={() => {
+                setHasEntered(true);
+              }}
+            >
+              <span className="rounded-full border border-white/70 bg-black/35 px-6 py-3 text-lg backdrop-blur-sm">
+                음악과 함께 보기
+              </span>
+            </button>
+          ) : null}
         </div>
 
         <UngjaeGreeting />
