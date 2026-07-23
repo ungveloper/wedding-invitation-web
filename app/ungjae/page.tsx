@@ -902,7 +902,7 @@ export default function UngJae(): React.ReactElement {
       />
 
       <main className="mx-auto flex w-full max-w-md flex-col min-[449px]:border-x min-[449px]:border-[#e5e5e5]">
-        <div className="relative aspect-9/16 w-full overflow-hidden bg-black">
+        <div className="relative aspect-1/1.25 w-full overflow-hidden bg-black">
           <video
             src="/videos/youngung.mp4"
             autoPlay
