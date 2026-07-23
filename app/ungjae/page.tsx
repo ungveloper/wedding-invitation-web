@@ -910,8 +910,6 @@ function UngjaeSignoff(): React.ReactElement {
 }
 
 export default function UngJae(): React.ReactElement {
-  const [hasEntered, setHasEntered] = useState(false);
-
   return (
     <>
       <BackgroundMusic
@@ -937,20 +935,6 @@ export default function UngJae(): React.ReactElement {
             preload="auto"
             className="h-full w-full object-cover"
           />
-
-          {!hasEntered ? (
-            <button
-              type="button"
-              className={`absolute inset-0 z-10 flex cursor-pointer items-end justify-center bg-black/10 pb-10 text-white ${GowunDodum.className}`}
-              onClick={() => {
-                setHasEntered(true);
-              }}
-            >
-              <span className="rounded-full border border-white/70 bg-black/35 px-6 py-3 text-lg backdrop-blur-sm">
-                음악과 함께 보기
-              </span>
-            </button>
-          ) : null}
         </div>
 
         <UngjaeGreeting />
