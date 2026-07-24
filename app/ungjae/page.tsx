@@ -284,8 +284,8 @@ const content = {
     groom: [
       {
         id: 'groom-mother',
-        role: '카카오뱅크 박순영',
-        accountNumber: '3333-21-0312583',
+        role: '부산은행 박순영',
+        accountNumber: '076020405912',
         bank: '',
         holder: '',
       },
